@@ -53,6 +53,8 @@ namespace larlite {
     void Configure(const std::string cfg_file)
     { _config_file = cfg_file; }
 
+    const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
+
   protected:
 
     // config file

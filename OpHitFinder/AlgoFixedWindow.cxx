@@ -59,6 +59,10 @@ namespace pmtana{
 
     _pulse_v[0].t_start = (double)(_index_start);
 
+    _pulse_v[0].ped_mean  = _ped_mean;
+
+    _pulse_v[0].ped_sigma = _ped_rms;
+
     if(!_index_end)
 
       _pulse_v[0].t_end = (double)(wf.size() - 1);

@@ -102,16 +102,17 @@ namespace larlite {
 	continue;
       }
 
-      if(!_preco_mgr.RecoPulse(wf_ptr)) {
+      _preco_mgr.RecoPulse(wf_ptr);
 
+      auto const& pulses = _preco_alg->GetPulses();
+
+      if(pulses.empty())
+	
 	std::cout << "\033[95m[WARNING]\033[00m PulseFinder algorithm returned invalid status! (Ch. " << Channel << ")" << std::endl;
 
-      }
+      for(size_t k=0; k<pulses.size(); ++k){
 
-      const size_t NPulses = _preco_alg->GetNPulse();
-      for(size_t k=0; k<NPulses; ++k){
-
-	auto const& pulse = _preco_alg->GetPulse(k);
+	auto const& pulse = pulses[k];
 
 	double AbsTime = TimeStamp + pulse.t_max * ts->OpticalClock().TickPeriod();
 
@@ -133,6 +134,24 @@ namespace larlite {
     //e.put(std::move(ophits));
   
     return true;
+  }
+
+  const std::vector<pmtana::pulse_param>& OpHitFinder::Reconstruct(const std::vector<short>& wf)
+  {
+
+    if(!_preco_alg) {
+
+      std::cerr << "\033[93m[ERROR]\033[00m "
+		<< "Pulse reco algorithm not yet set. Make sure to call initialize() before anything!"
+		<< std::endl;
+
+      throw std::exception();
+    }
+
+    _preco_mgr.RecoPulse(wf);
+
+    return _preco_alg->GetPulses();
+
   }
 
   bool OpHitFinder::finalize() {

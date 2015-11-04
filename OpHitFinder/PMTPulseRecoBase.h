@@ -31,19 +31,22 @@ namespace pmtana
 {
 
   struct pulse_param{
-  
-    double peak, area;
+  public:
+    double peak, area, ped_mean, ped_sigma;
     double t_start, t_max, t_end;
   
     pulse_param(){
       reset_param();
-    };
+    }
+
+    ~pulse_param(){}
   
     void reset_param(){
       area = 0;
       peak = -1;
+      ped_mean = ped_sigma = -1;
       t_start = t_max = t_end = -1;
-    };
+    }
     
   };
 
@@ -85,6 +88,9 @@ namespace pmtana
       Note you must, accordingly, provide an index key to specify which pulse_param object to be retrieved.
     */
     const pulse_param& GetPulse(size_t index=0) const;
+
+    /// A getter for the whole array of pulse_param struct object.
+    const std::vector<pulse_param>& GetPulses() const;
 
     /// A getter for the number of reconstructed pulses from the input waveform
     size_t GetNPulse() const {return _pulse_v.size();};

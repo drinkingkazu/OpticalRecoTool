@@ -70,6 +70,8 @@ namespace pmtana{
 
 	fire = true;
 
+	_pulse.ped_mean  = _ped_mean;
+	_pulse.ped_sigma = _ped_rms;
 	_pulse.t_start = counter;
 
       }

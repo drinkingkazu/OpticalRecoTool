@@ -264,7 +264,9 @@ namespace pmtana{
 	  throw std::exception();
 	}
 
-	_pulse.t_start = i - buffer_num_index;
+	_pulse.t_start   = i - buffer_num_index;
+	_pulse.ped_mean  = pulse_start_baseline;
+	_pulse.ped_sigma = _local_sigma.at(i);
 
 	for(size_t pre_index=_pulse.t_start; pre_index<i; ++pre_index) {
 

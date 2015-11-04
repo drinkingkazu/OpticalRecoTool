@@ -77,6 +77,13 @@ namespace pmtana{
   }
 
   //***************************************************************
+  const std::vector<pmtana::pulse_param>& PMTPulseRecoBase::GetPulses() const
+  //***************************************************************
+  {
+    return _pulse_v;
+  }
+
+  //***************************************************************
   bool PMTPulseRecoBase::Integral(const std::vector<short> &wf,
 				  double &result,
 				  size_t begin,
