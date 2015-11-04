@@ -1,6 +1,6 @@
 # for processing
 import sys
-from ROOT import TChain#, pmtana
+from ROOT import TChain, larutil
 from larlite import larlite as fmwk
 # for plotting
 import matplotlib
@@ -48,9 +48,15 @@ for entry in xrange(ch.GetEntries()):
         print '  Reading OpDigit index',opdigit_index
 
         opdigit = br[opdigit_index]
+        opch = opdigit.ChannelNumber()
+        if opch > 32: continue
+
+        if not opdigit.size(): continue
+
+        pmt_id = larutil.Geometry.GetME().OpDetFromOpChannel(opch)
 
         print
-        print '    Ch.:',opdigit.ChannelNumber(),'Size:',opdigit.size(),'Time:',opdigit.TimeStamp()
+        print '    PMT:',pmt_id,'Ch.:',opdigit.ChannelNumber(),'Size:',opdigit.size(),'Time:',opdigit.TimeStamp()
         print
 
         pulses = my_module.Reconstruct(opdigit)
