@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef ALGOSLIDINGWINDOW_H
-#define ALGOSLIDINGWINDOW_H
+#ifndef ALGOSLIDINGWINDOWTWO_H
+#define ALGOSLIDINGWINDOWTWO_H
 
 #include "PMTPulseRecoBase.h"
 //#include "fhiclcpp/ParameterSet.h"
@@ -23,24 +23,24 @@ namespace pmtana
 {
 
   /**
-   \class AlgoSlidingWindow
-   This class implements threshold algorithm to AlgoSlidingWindow class.
+   \class AlgoSlidingWindowTwo
+   This class implements threshold algorithm to AlgoSlidingWindowTwo class.
   */
-  class AlgoSlidingWindow : public PMTPulseRecoBase {
+  class AlgoSlidingWindowTwo : public PMTPulseRecoBase {
 
   public:
 
     /// Default constructor
-    //AlgoSlidingWindow(const fhicl::ParameterSet &pset);
-    AlgoSlidingWindow(const ::fcllite::PSet &pset);
+    //AlgoSlidingWindowTwo(const fhicl::ParameterSet &pset);
+    AlgoSlidingWindowTwo(const ::fcllite::PSet &pset);
 
     /// Default destructor
-    virtual ~AlgoSlidingWindow();
+    virtual ~AlgoSlidingWindowTwo();
 
-    /// Implementation of AlgoSlidingWindow::reco() method
+    /// Implementation of AlgoSlidingWindowTwo::reco() method
     virtual bool RecoPulse(const std::vector<short> &wf);
     
-    /// Implementation of AlgoSlidingWindow::reset() method
+    /// Implementation of AlgoSlidingWindowTwo::reset() method
     virtual void Reset();
 
     bool ConstructPedestal(const std::vector<short> &wf);
@@ -72,11 +72,21 @@ namespace pmtana
     float  _ped_range_min;
     std::vector<float> _local_mean;
     std::vector<float> _local_sigma;
-  
-  };
 
+  private:
+    
+    template<typename S>
+    float calc_mean (const std::vector<S>& data) const;
+
+    template<typename S>
+    float calc_sigma(const std::vector<S>& data, const float mean) const;
+    
+    template<typename T>
+    std::vector<std::vector<T> > get_windows(const std::vector<T>& the_thing,
+					     const int window_size) const;
+  };
+  
 }
 #endif
 
 /** @} */ // end of doxygen group
-

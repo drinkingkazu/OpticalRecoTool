@@ -52,9 +52,12 @@ namespace larlite {
 
     void Configure(const std::string cfg_file)
     { _config_file = cfg_file; }
-
+    
     const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
-
+    const std::pair< std::vector<double>,
+		     std::vector<double> > ReconstructBaseline(const std::vector<short>& wf,
+							       const int ws);
+	
   protected:
 
     // config file
@@ -68,7 +71,12 @@ namespace larlite {
     double _spe_size;
     bool _verbose;
     ::pmtana::PMTPulseRecoBase* _preco_alg;
-    
+
+  private:
+
+    template<typename T>
+    std::vector<std::vector<T> > windows(const std::vector<T>& the_thing,
+					 const int window_size) const;
   };
 }
 #endif

@@ -53,6 +53,6 @@ OpHitFinder:
   SPESize: 118
   Verbosity: false
  #  HitAlgoPset: @local::standard_algo_fixedwindow
-   HitFinder: SlidingWindow
- #  HitFinder: SlidingWindowTwo
+ #  HitFinder: SlidingWindow
+   HitFinder: SlidingWindowTwo
 }

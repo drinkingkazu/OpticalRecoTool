@@ -9,6 +9,7 @@
 #include "LArUtil/Geometry.h"
 #include "AlgoThreshold.h"
 #include "AlgoSlidingWindow.h"
+#include "AlgoSlidingWindowTwo.h"
 #include "AlgoFixedWindow.h"
 
 namespace larlite {
@@ -50,13 +51,15 @@ namespace larlite {
     std::string hit_alg_name = p.get<std::string>("HitFinder");
 
     auto const pset = main_cfg.get_pset(hit_alg_name);
-
+    
     if(hit_alg_name == "Threshold")
       _preco_alg = new pmtana::AlgoThreshold(pset);
     else if(hit_alg_name == "FixedWindow")
       _preco_alg = new pmtana::AlgoFixedWindow(pset);
     else if(hit_alg_name == "SlidingWindow")
       _preco_alg = new pmtana::AlgoSlidingWindow(pset);
+    else if(hit_alg_name == "SlidingWindowTwo")
+      _preco_alg = new pmtana::AlgoSlidingWindowTwo(pset);
 
     _preco_mgr.AddRecoAlgo(_preco_alg);
     
@@ -102,8 +105,11 @@ namespace larlite {
 	continue;
       }
 
+
+      /// Reconstruct the pulse
       _preco_mgr.RecoPulse(wf_ptr);
 
+      /// Get the result
       auto const& pulses = _preco_alg->GetPulses();
 
       if(pulses.empty())
@@ -139,6 +145,7 @@ namespace larlite {
   const std::vector<pmtana::pulse_param>& OpHitFinder::Reconstruct(const std::vector<short>& wf)
   {
 
+    
     if(!_preco_alg) {
 
       std::cerr << "\033[93m[ERROR]\033[00m "
@@ -153,10 +160,108 @@ namespace larlite {
     return _preco_alg->GetPulses();
 
   }
+  
+  
+  const std::pair< std::vector<double>,
+		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
+									  const int ws)
+  {
 
+    
+    if(!_preco_alg) {
+
+      std::cerr << "\033[93m[ERROR]\033[00m "
+		<< "Pulse reco algorithm not yet set. Make sure to call initialize() before anything!"
+		<< std::endl;
+
+      throw std::exception();
+    }
+
+    //Calculate pedestal baseline and return it
+    auto ped_mean  = double{0.0};
+    auto ped_sigma = double{0.0};
+
+    std::vector<double> local_mean;
+    std::vector<double> local_sigma;
+
+    local_mean.reserve(wf.size());
+    local_sigma.reserve(wf.size());
+
+    for(const auto& window : windows(wf,ws) ) {
+
+      ped_mean  = 0.0;
+      ped_sigma = 0.0;
+      
+      double nsample = window.size();
+      
+      for(const auto & w : window)
+
+	ped_mean += w;
+
+      
+      
+      ped_mean /= nsample;
+            
+      for(const auto & w : window)
+	
+	ped_sigma += pow( w - ped_mean , 2 );
+      
+      ped_sigma = sqrt ( ped_sigma / nsample );
+
+      
+      local_mean.push_back (ped_mean);
+      local_sigma.push_back(ped_sigma);
+      
+    }
+    
+    return std::make_pair(local_mean,local_sigma);
+  }
+
+ 
+  
   bool OpHitFinder::finalize() {
 
     return true;
+  }
+
+
+
+  template<typename T>
+  std::vector<std::vector<T> > OpHitFinder::windows(const std::vector<T>& the_thing,
+						    const int window_size) const
+  {
+    
+    std::vector<std::vector<T> > data;
+    
+    auto w = window_size + 2;
+    w = (unsigned int)((w - 1)/2);
+    auto num = the_thing.size();
+
+    if(window_size > num) {
+      std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m window_size > num" << std::endl;
+      throw std::exception();
+    }
+    
+    data.reserve(num);
+    
+    for(int i = 1; i <= num; ++i) {
+      std::vector<T> inner;
+      inner.reserve(20);
+      if(i < w) {
+	for(int j = 0; j < 2 * (i%w) - 1; ++j)
+	  inner.push_back(the_thing[j]);
+      }else if (i > num - w + 1){
+	for(int j = num - 2*((num - i)%w)-1 ; j < num; ++j)
+	  inner.push_back(the_thing[j]);
+      }else{
+	for(int j = i - w; j < i + w - 1; ++j)
+	  inner.push_back(the_thing[j]);
+      }
+      data.emplace_back(inner);
+    }
+
+    return data;
+  
   }
 
 }

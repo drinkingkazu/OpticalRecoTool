@@ -4,16 +4,16 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef ALGOSLIDINGWINDOW_CXX
-#define ALGOSLIDINGWINDOW_CXX
+#ifndef ALGOSLIDINGWINDOWTWO_CXX
+#define ALGOSLIDINGWINDOWTWO_CXX
 
-#include "AlgoSlidingWindow.h"
+#include "AlgoSlidingWindowTwo.h"
 
 namespace pmtana{
 
   //############################
   //AlgoSlidingWindow::AlgoSlidingWindow(const fhicl::ParameterSet &pset)
-  AlgoSlidingWindow::AlgoSlidingWindow(const ::fcllite::PSet &pset)
+  AlgoSlidingWindowTwo::AlgoSlidingWindowTwo(const ::fcllite::PSet &pset)
   //############################
   {
 
@@ -42,58 +42,75 @@ namespace pmtana{
   }
 
   //***************************************************************
-  AlgoSlidingWindow::~AlgoSlidingWindow()
+  AlgoSlidingWindowTwo::~AlgoSlidingWindowTwo()
   //***************************************************************
   {}
 
   //***************************************************************
-  void AlgoSlidingWindow::Reset()
+  void AlgoSlidingWindowTwo::Reset()
   //***************************************************************
   {
     PMTPulseRecoBase::Reset();
   }
 
   //**********************************************************************
-  bool AlgoSlidingWindow::ConstructPedestal(const std::vector<short> &wf)
+  bool AlgoSlidingWindowTwo::ConstructPedestal(const std::vector<short> &wf)
   //**********************************************************************
   {
     // parameters
     if(wf.size()<=_min_wf_size) return false;
     
-    //
-    // Compute pedestal by itself
-    //
-    _local_mean.resize(wf.size(),0);
-    _local_sigma.resize(wf.size(),100);
+    // //
+    // // Compute pedestal by itself
+    // //
+    // _local_mean.resize(wf.size(),0);
+    // _local_sigma.resize(wf.size(),100);
 
-    for(size_t i=0; i<wf.size(); ++i) {
+    // for(size_t i=0; i<wf.size(); ++i) {
 
-      if( (i+_min_wf_size) == wf.size() ){
-	float last_mean = _local_mean.at(i-1);
-	float last_sigma = _local_sigma.at(i-1);
-	for(size_t j=i; j<wf.size(); ++j) {
-	  _local_mean.at(j) = last_mean;
-	  _local_sigma.at(j) = last_sigma;
-	}
-	break;
-      }
+    //   if( (i+_min_wf_size) == wf.size() ){
+    // 	float last_mean = _local_mean.at(i-1);
+    // 	float last_sigma = _local_sigma.at(i-1);
+    // 	for(size_t j=i; j<wf.size(); ++j) {
+    // 	  _local_mean.at(j) = last_mean;
+    // 	  _local_sigma.at(j) = last_sigma;
+    // 	}
+    // 	break;
+    //   }
 
-      double mean = 0;
-      double sigma = 0;
+    //   double mean = 0;
+    //   double sigma = 0;
 
-      // interesting... only look forward ahead if wf index, why?
-      for(size_t j=0; j<_min_wf_size; ++j) mean += wf.at(i+j);
+    //   // interesting... only look forward ahead if wf index, why?
+    //   for(size_t j=0; j<_min_wf_size; ++j) mean += wf.at(i+j);
 
-      mean /= ((float)_min_wf_size);
+    //   mean /= ((float)_min_wf_size);
       
-      for(size_t j=0; j<_min_wf_size; ++j) sigma += pow( (wf.at(i+j) - mean), 2 );
+    //   for(size_t j=0; j<_min_wf_size; ++j) sigma += pow( (wf.at(i+j) - mean), 2 );
 
-      sigma = sqrt(sigma/((float)(_min_wf_size)));
+    //   sigma = sqrt(sigma/((float)(_min_wf_size)));
 
-      _local_mean.at(i)  = mean;
-      _local_sigma.at(i) = sigma;
+    //   _local_mean.at(i)  = mean;
+    //   _local_sigma.at(i) = sigma;
+    // }
+
+
+    for(const auto& window : get_windows(wf,_min_wf_size) ) {
+      auto mean = calc_mean(window);
+      _local_mean.push_back (mean);
+      _local_sigma.push_back(calc_sigma(window,mean));
     }
 
+    //Set the edge values so sigma and mean aren't totally useless there...
+    for(unsigned i = 0 ; i < _min_wf_size; ++i) {
+
+      _local_mean.at (i) = _local_mean.at (_min_wf_size);
+      _local_sigma.at(i) = _local_sigma.at(_min_wf_size);
+
+      _local_mean.at (_local_mean.size()  - 1 - i) = _local_mean.at (_min_wf_size);
+      _local_sigma.at(_local_sigma.size() - 1 - i) = _local_sigma.at(_min_wf_size);
+    }
+    
     float  best_sigma = 1.1e9;
     size_t best_sigma_index = 0;
     size_t num_good_adc = 0;
@@ -109,7 +126,8 @@ namespace pmtana{
       }
       if(sigma < _max_sigma) num_good_adc += 1;
     }
-    
+
+
     if( num_good_adc < 1 ) {
       std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal at all..." << std::endl;
       return false;
@@ -153,7 +171,6 @@ namespace pmtana{
       }
     }
 
-    // std::cout<<"Used "<<good_ctr<<std::endl;
 
     // Next do extrapolation to the first and end
     if(_local_sigma.front() > _max_sigma) {
@@ -200,7 +217,7 @@ namespace pmtana{
 
 
   //***************************************************************
-  bool AlgoSlidingWindow::RecoPulse(const std::vector<short> &wf)
+  bool AlgoSlidingWindowTwo::RecoPulse(const std::vector<short> &wf)
   //***************************************************************
   {
 
@@ -350,9 +367,67 @@ namespace pmtana{
       _pulse.reset_param();
 
     }
-
+    
     return true;
 
+  }
+
+  template<typename S>
+  float AlgoSlidingWindowTwo::calc_mean(const std::vector<S>& data) const
+  {
+    // if(!data.size())
+    //   Print(msg::kEXCEPTION,__FUNCTION__,"You have me nill to calc_mean");
+
+    auto sum = float{0.0};
+    for(const auto& d : data) sum += d;
+    return sum / ( (float) data.size() ); //hopefully this isn't int :)
+  }
+
+
+  template<typename S>
+  float AlgoSlidingWindowTwo::calc_sigma(const std::vector<S>& data, const float mean) const
+  {
+    auto sum = float{0.0};
+    for(const auto& d : data) sum += (d - mean) * (d - mean);
+    return sqrt( sum / ( (float) data.size() ) );
+  }
+  
+  template<typename T>
+  std::vector<std::vector<T> > AlgoSlidingWindowTwo::get_windows(const std::vector<T>& the_thing,
+								 const int window_size) const
+  {
+
+    std::vector<std::vector<T> > data;
+    
+    auto w = window_size + 2;
+    w = (unsigned int)((w - 1)/2);
+    auto num = the_thing.size();
+
+    if(window_size > num) {
+      std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m window_size > num" << std::endl;
+      throw std::exception();
+    }
+    
+    data.reserve(num);
+    
+    for(int i = 1; i <= num; ++i) {
+      std::vector<T> inner;
+      inner.reserve(20);
+      if(i < w) {
+	for(int j = 0; j < 2 * (i%w) - 1; ++j)
+	  inner.push_back(the_thing[j]);
+      }else if (i > num - w + 1){
+	for(int j = num - 2*((num - i)%w)-1 ; j < num; ++j)
+	  inner.push_back(the_thing[j]);
+      }else{
+	for(int j = i - w; j < i + w - 1; ++j)
+	  inner.push_back(the_thing[j]);
+      }
+      data.emplace_back(inner);
+    }
+
+    return data;
+  
   }
 
 }

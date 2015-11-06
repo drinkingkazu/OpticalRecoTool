@@ -7,6 +7,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.colors as mpc
 import matplotlib.dates as dts
+
+import matplotlib.patches as patches
+
 import numpy as np
 import os
 plt.rcParams.update({'font.size': 16})
@@ -65,7 +68,8 @@ for entry in xrange(ch.GetEntries()):
         fig,ax = plt.subplots(figsize=(10,6))
 
         # Create np.array instead of using opdigit as is (which is totally fine) to get useful np.array functions
-        wf = np.array(opdigit)
+        # wf = np.array(opdigit)
+        wf = np.array(opdigit.Waveform())
         
         plt.plot(np.arange(0,opdigit.size(),1),wf,marker='o',linestyle='--')
 
@@ -74,19 +78,36 @@ for entry in xrange(ch.GetEntries()):
 
         xmin = 0
         xmax = len(opdigit)
+        a = 0
+        b = 0
         for p in pulses:
 
-            span_xmin = p.t_start / len(opdigit)
-            span_xmax = p.t_end / len(opdigit)
-            
+            # span_xmin = p.t_start / len(opdigit)
+            # span_xmax = p.t_end / len(opdigit)
+
+            # span_ymax = p.peak + p.ped_mean
+            # span_ymin = p.ped_mean
+
+            span_xmin = p.t_start
+            span_xmax = p.t_end
+
             span_ymax = p.peak + p.ped_mean
             span_ymin = p.ped_mean
+            
+            
+            ax.add_patch(patches.Rectangle((span_xmin, span_ymin),
+                                           span_xmax - span_xmin,
+                                           span_ymax - span_ymin,
+                                           color='orange',alpha=0.5,lw=2))
 
-            plt.axhspan(xmin = span_xmin,
-                        xmax = span_xmax,
-                        ymin = span_ymin,
-                        ymax = span_ymax,
-                        color='orange',lw=2,alpha=0.5)
+            # plt.axhspan(xmin = span_xmin,
+            #             xmax = span_xmax,
+            #             ymin = span_ymin,
+            #             ymax = span_ymax,
+            #             color='orange',lw=2,alpha=0.5)
+
+
+
             print span_xmin, span_xmax, span_ymin, span_ymax
 
             #if xmin == 0: xmin = span_xmin
@@ -96,6 +117,7 @@ for entry in xrange(ch.GetEntries()):
         plt.xlabel('Time Tick [15.6 ns]',fontsize=20)
         plt.ylabel('ADC',fontsize=20)
         plt.ylim(ymin-5,ymax+5)
+        #plt.xlim(a-2,b+2)
         #plt.xlim(0,len(wf))
         plt.xlim(xmin,xmax)
         ax.xaxis.set_tick_params(labelsize=18)
