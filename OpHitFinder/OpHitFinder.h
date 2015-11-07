@@ -54,12 +54,17 @@ namespace larlite {
     { _config_file = cfg_file; }
     
     const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
-    const std::pair< std::vector<double>,
-		     std::vector<double> > ReconstructBaseline(const std::vector<short>& wf,
-							       const int ws);
-	
-  protected:
+    // const std::pair< std::vector<double>,
+    // 		     std::vector<double> > ReconstructBaseline(const std::vector<short>& wf,
+    // 							       const int ws);
+    const std::pair<double,double> ReconstructBaseline(const std::vector<short>& wf,
+						       const int ws);
 
+    const std::vector<double> CFTrace(const std::vector<short>& wf,
+				      const float    F,
+				      const unsigned D) const;
+  protected:
+    
     // config file
     ::fcllite::ConfigManager _cfg_mgr;
     std::string _config_file;
@@ -77,6 +82,8 @@ namespace larlite {
     template<typename T>
     std::vector<std::vector<T> > windows(const std::vector<T>& the_thing,
 					 const int window_size) const;
+
+    const double get_max (const std::vector<double>& v ,int bins) const;
   };
 }
 #endif

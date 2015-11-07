@@ -12,6 +12,9 @@
 #include "AlgoSlidingWindowTwo.h"
 #include "AlgoFixedWindow.h"
 
+
+#include "TH1D.h"
+
 namespace larlite {
 
   OpHitFinder::OpHitFinder(const std::string name) : _cfg_mgr("OpHitFinder")
@@ -162,9 +165,33 @@ namespace larlite {
   }
   
   
-  const std::pair< std::vector<double>,
-		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
-									  const int ws)
+  const std::vector<double> OpHitFinder::CFTrace(const std::vector<short>& wf,
+						 const float F,
+						 const unsigned D) const {
+
+    std::vector<double> cfd; cfd.reserve(wf.size());
+
+    /// we are going to lose D values of of each end since we go left to right
+    /// later we can go the other direction
+    for (unsigned k = D; k < wf.size(); ++k) 
+      
+      cfd.push_back(F * (float) wf.at(k) - (float) wf.at(k - D););
+    
+    //temporary, extend vector to match length of usual one
+    while(cfd.size() < wf.size())
+
+      cfd.push_back(cfd.back());
+    
+    return cfd;
+  }
+  
+  
+  // const std::pair< std::vector<double>,
+  // 		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
+  // 									  const int ws)
+  
+  const std::pair<double,double> OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
+								  const int ws)
   {
 
     
@@ -198,8 +225,6 @@ namespace larlite {
 
 	ped_mean += w;
 
-      
-      
       ped_mean /= nsample;
             
       for(const auto & w : window)
@@ -213,11 +238,34 @@ namespace larlite {
       local_sigma.push_back(ped_sigma);
       
     }
+
+    // I don't know if I can write a faster histogram algo than in ROOT
+    // so for now I steal TH1D...
+    int bins = 25; // this determines I guess pedestal resolution
+
+    auto max_mean  = get_max(local_mean,  bins);
+    auto max_sigma = get_max(local_sigma, bins);
     
-    return std::make_pair(local_mean,local_sigma);
+    std::cout << " max of mean : " << max_mean  << "\n";
+    std::cout << " max of sigma: " << max_sigma << "\n";
+    
+    //return std::make_pair(local_mean,local_sigma);
+    return std::make_pair(max_mean,max_sigma);
   }
 
- 
+  
+  const double OpHitFinder::get_max(const std::vector<double>& v ,int bins) const {
+    
+    auto max_it = std::max_element(std::begin(v), std::end(v));
+    auto min_it = std::min_element(std::begin(v), std::end(v));
+
+    TH1D th("th",";;",bins,*max_it,*min_it);
+    
+    for (const auto & m : v) th.Fill(m);
+
+    return th.GetXaxis()->GetBinCenter(th.GetMaximumBin());
+
+  }
   
   bool OpHitFinder::finalize() {
 
@@ -227,7 +275,7 @@ namespace larlite {
 
 
   template<typename T>
-  std::vector<std::vector<T> > OpHitFinder::windows(const std::vector<T>& the_thing,
+  std::vector<std::vector<T> > OpHitFinder::windows(const std::vector<T>& thing,
 						    const int window_size) const
   {
     
@@ -235,7 +283,7 @@ namespace larlite {
     
     auto w = window_size + 2;
     w = (unsigned int)((w - 1)/2);
-    auto num = the_thing.size();
+    auto num = thing.size();
 
     if(window_size > num) {
       std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m window_size > num" << std::endl;
@@ -249,13 +297,13 @@ namespace larlite {
       inner.reserve(20);
       if(i < w) {
 	for(int j = 0; j < 2 * (i%w) - 1; ++j)
-	  inner.push_back(the_thing[j]);
+	  inner.push_back(thing[j]);
       }else if (i > num - w + 1){
 	for(int j = num - 2*((num - i)%w)-1 ; j < num; ++j)
-	  inner.push_back(the_thing[j]);
+	  inner.push_back(thing[j]);
       }else{
 	for(int j = i - w; j < i + w - 1; ++j)
-	  inner.push_back(the_thing[j]);
+	  inner.push_back(thing[j]);
       }
       data.emplace_back(inner);
     }
