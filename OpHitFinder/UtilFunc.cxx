@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cmath>
-
+#include <iostream>
 namespace pmtana {
 
   double mean(const std::vector<short>& wf, size_t start, size_t nsample)
@@ -15,9 +15,9 @@ namespace pmtana {
     if(start > wf.size() || (start+nsample) > wf.size())
       throw OpticalRecoException("Invalid start/end index!");
 
-    double sum = std::accumulate(wf.begin()+start,wf.begin()+start+nsample,0.0);
+    double sum = std::accumulate(wf.begin()+start,wf.begin()+start+nsample,0.0) / ((double)nsample);
 
-    return ( sum / ((double)nsample) );
+    return sum;
   }
 
   double std(const std::vector<short>& wf, const double ped_mean, size_t start, size_t nsample)
@@ -26,13 +26,15 @@ namespace pmtana {
     if(start > wf.size() || (start+nsample) > wf.size())
       throw OpticalRecoException("Invalid start/end index!");
 
-    double ped_sigma = 0;
+    double sigma = 0;
 
-    for(size_t index=0; index < (start+nsample); ++index)
+    for(size_t index=start; index < (start+nsample); ++index)
     
-      ped_sigma += pow( (wf[index] - ped_mean), 2 );
+      sigma += pow( (wf[index] - ped_mean), 2 );
 
-    return sqrt(ped_sigma/((double)(nsample)));
+    sigma = sqrt(sigma/((double)(nsample)));
+
+    return sigma;
   }
 
   double BinnedMaxOccurrence(const PedestalMean_t& mean_v,const size_t nbins)

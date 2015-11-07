@@ -50,7 +50,7 @@ PedEdges:
 PedTruncatedMean:
 {
     SampleSize:      2
-    MaxSigma:        1.0
+    MaxSigma:        0.5
     PedRangeMax:     2150
     PedRangeMin:     100
 }
@@ -65,7 +65,7 @@ OpHitFinder:
   Verbosity: false
  #  HitAlgoPset: @local::standard_algo_fixedwindow
   HitFinder: SlidingWindow
-#  Pedestal:  PedTruncatedMean
-  Pedestal:  PedEdges
+  Pedestal:  PedTruncatedMean
+#  Pedestal:  PedEdges
  #  HitFinder: SlidingWindowTwo
 }

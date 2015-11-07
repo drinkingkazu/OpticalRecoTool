@@ -61,8 +61,9 @@ for entry in xrange(ch.GetEntries()):
         print
         print '    PMT:',pmt_id,'Ch.:',opdigit.ChannelNumber(),'Size:',opdigit.size(),'Time:',opdigit.TimeStamp()
         print
-
-        pulses = my_module.Reconstruct(opdigit)
+        my_module.Reconstruct(opdigit)
+        
+        pulses = my_module.Pulses()
         print '    Found',pulses.size(),'pulses!'
 
         fig,ax = plt.subplots(figsize=(10,6))
@@ -71,8 +72,10 @@ for entry in xrange(ch.GetEntries()):
         # wf = np.array(opdigit)
         wf = np.array(opdigit.Waveform())
         
-        plt.plot(np.arange(0,opdigit.size(),1),wf,marker='o',linestyle='--')
-
+        plt.plot(np.arange(0,opdigit.size(),1),wf,marker='o',linestyle='--',color='black')
+        plt.errorbar(np.arange(0,opdigit.size(),1),my_module.PedestalMean(),yerr=my_module.PedestalSigma(),
+                     marker='o',linestyle='-',color='red')
+        
         ymax = wf.max()
         ymin = wf.min()
 

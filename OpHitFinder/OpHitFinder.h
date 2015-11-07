@@ -53,7 +53,13 @@ namespace larlite {
     void Configure(const std::string cfg_file)
     { _config_file = cfg_file; }
     
-    const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
+    bool Reconstruct(const std::vector<short>& wf);
+
+    const std::vector<pmtana::pulse_param>& Pulses() const;
+
+    const ::pmtana::PedestalMean_t PedestalMean() const;
+
+    const ::pmtana::PedestalSigma_t PedestalSigma() const;
 
     const std::vector<double> CFTrace(const std::vector<short>& wf,
 				      const float    F,

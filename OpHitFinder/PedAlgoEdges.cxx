@@ -70,9 +70,9 @@ namespace pmtana{
       break;
     case kBOTH:
       double ped_mean_head  = mean ( wf, 0, _nsample_front);
-      double ped_sigma_head = std  ( wf, ped_mean, 0, _nsample_front);
+      double ped_sigma_head = std  ( wf, ped_mean_head, 0, _nsample_front);
       double ped_mean_tail  = mean ( wf, (wf.size() - _nsample_tail), _nsample_tail);
-      double ped_sigma_tail = std  ( wf, ped_mean, (wf.size() - _nsample_tail), _nsample_tail);
+      double ped_sigma_tail = std  ( wf, ped_mean_tail, (wf.size() - _nsample_tail), _nsample_tail);
 
       ped_mean  = ped_mean_head;
       ped_sigma = ped_sigma_head;

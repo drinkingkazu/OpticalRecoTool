@@ -160,7 +160,7 @@ namespace larlite {
     return true;
   }
 
-  const std::vector<pmtana::pulse_param>& OpHitFinder::Reconstruct(const std::vector<short>& wf)
+  bool OpHitFinder::Reconstruct(const std::vector<short>& wf)
   {
 
     if(!_preco_alg) {
@@ -172,12 +172,18 @@ namespace larlite {
       throw std::exception();
     }
 
-    _preco_mgr.Reconstruct(wf);
-
-    return _preco_alg->GetPulses();
+    return _preco_mgr.Reconstruct(wf);
 
   }
+
+  const std::vector<pmtana::pulse_param>& OpHitFinder::Pulses() const
+  { return _preco_alg->GetPulses(); }
   
+  const ::pmtana::PedestalMean_t OpHitFinder::PedestalMean() const
+  { return _ped_alg->Mean(); }
+  
+  const ::pmtana::PedestalSigma_t OpHitFinder::PedestalSigma() const
+  { return _ped_alg->Sigma(); }
   
   const std::vector<double> OpHitFinder::CFTrace(const std::vector<short>& wf,
 						 const float F,
