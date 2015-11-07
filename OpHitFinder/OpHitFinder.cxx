@@ -187,23 +187,49 @@ namespace larlite {
 	cfd.push_back( -1.0 * delayed +  ( (float) wf.at(k - D) - ped ) );
     }
     
-    //temporary, extend vector to match length of usual one
-    // while(cfd.size() < wf.size())
 
-    //   cfd.push_back(cfd.back());
-    
     return cfd;
   }
   
-   // const double OpHitFinder::LinearZeroPointX(const std::vector<W>& trace) const {
+  //const double OpHitFinder::LinearZeroPointX(const std::vector<double>& trace) const {
+  const std::map<unsigned,double> OpHitFinder::LinearZeroPointX(const std::vector<double>& trace) const {
 
-   //   auto x = double{0.0};
+     auto x = double{0.0};
+     std::map<unsigned,double> crossing;
+     //step through the trace and find where slope is POSITIVE across zero
+
+     for ( unsigned i = 0; i < trace.size() - 1; ++i) {
+
+       auto si = sign(trace.at(i));
+       auto sf = sign(trace.at(i+1));
+
+       if ( si == sf ) //no sign flip, no zero cross
+	 continue;
+       
+       if ( sf < si ) //this is a negative slope, continue
+	 continue;
+
+       //calculate the crossing X based on linear interpolation bt two pts
+
+       crossing[i] = (double) i - trace.at(i) * ( 1.0 / ( trace.at(i+1) - trace.at(i) ) );
+       
+     }
      
-     
-     
-   //   return x;
-   // }
+     // for (const auto& m : crossing )
+     //   std::cout << "index: "  << m.first << " X intercept: " << m.second << "\n";
+     return crossing;
+     //return x;
+  }
   
+  template<typename W>
+  int OpHitFinder::sign(W val) const{
+    
+    if (val > 0) return  1;
+    if (val < 0) return -1;
+    return 0;
+    
+  }
+
   // const std::pair< std::vector<double>,
   // 		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
   // 									  const int ws)

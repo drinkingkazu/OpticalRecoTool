@@ -54,9 +54,11 @@ namespace larlite {
     { _config_file = cfg_file; }
     
     const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
+
     // const std::pair< std::vector<double>,
     // 		     std::vector<double> > ReconstructBaseline(const std::vector<short>& wf,
     // 							       const int ws);
+    
     const std::pair<double,double> ReconstructBaseline(const std::vector<short>& wf,
 						       const int ws);
 
@@ -64,6 +66,9 @@ namespace larlite {
 				      const float    F,
 				      const unsigned D,
 				      const double ped) const;
+
+    //const double LinearZeroPointX(const std::vector<double>& trace) const;
+    const std::map<unsigned,double> LinearZeroPointX(const std::vector<double>& trace) const;
   protected:
     
     // config file
@@ -81,10 +86,14 @@ namespace larlite {
   private:
 
     template<typename T>
-    std::vector<std::vector<T> > windows(const std::vector<T>& the_thing,
+    std::vector<std::vector<T> > windows(const std::vector<T>& thing,
 					 const int window_size) const;
 
     const double get_max (const std::vector<double>& v ,int bins) const;
+
+    template<typename W> int sign(W val) const;
+      
+
   };
 }
 #endif
