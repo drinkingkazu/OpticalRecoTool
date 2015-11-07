@@ -167,18 +167,24 @@ namespace larlite {
   
   const std::vector<double> OpHitFinder::CFTrace(const std::vector<short>& wf,
 						 const float F,
-						 const unsigned D) const {
+						 const unsigned D,
+						 const double ped) const {
 
     std::vector<double> cfd; cfd.reserve(wf.size());
 
     /// we are going to lose D values of of each end since we go left to right
     /// later we can go the other direction
     for (unsigned k = 0; k < wf.size(); ++k)  {
-      auto delayed = F *  ( (float) wf.at(k) );
+
+      auto delayed = F *  ( (float) wf.at(k) - ped);
+
       if (k < D)
+
 	cfd.push_back( -1.0 * delayed);
+
       else
-	cfd.push_back(-1.0 * delayed +  ( (float) wf.at(k - D) ) );
+
+	cfd.push_back( -1.0 * delayed +  ( (float) wf.at(k - D) - ped ) );
     }
     
     //temporary, extend vector to match length of usual one
@@ -189,14 +195,14 @@ namespace larlite {
     return cfd;
   }
   
-  // const double OpHitFinder::LinearZeroPointX(const std::vector<W>& trace) const {
+   // const double OpHitFinder::LinearZeroPointX(const std::vector<W>& trace) const {
 
-  //   auto x = double{0.0};
-    
-    
-    
-  //   return x;
-  // }
+   //   auto x = double{0.0};
+     
+     
+     
+   //   return x;
+   // }
   
   // const std::pair< std::vector<double>,
   // 		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,

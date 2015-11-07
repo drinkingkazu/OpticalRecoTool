@@ -62,7 +62,8 @@ namespace larlite {
 
     const std::vector<double> CFTrace(const std::vector<short>& wf,
 				      const float    F,
-				      const unsigned D) const;
+				      const unsigned D,
+				      const double ped) const;
   protected:
     
     // config file
