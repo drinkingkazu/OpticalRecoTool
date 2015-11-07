@@ -4,26 +4,19 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef PULSERECOMANAGER_CC
-#define PULSERECOMANAGER_CC
+#ifndef PULSERECOMANAGER_CXX
+#define PULSERECOMANAGER_CXX
 
 #include "PulseRecoManager.h"
-
+#include "OpticalRecoException.h"
+#include <sstream>
 namespace pmtana{
 
-  //##################################
-  PulseRecoManager::PulseRecoManager()
-  //##################################
+  //*******************************************************
+  PulseRecoManager::PulseRecoManager() : _ped_algo(nullptr)
+  //*******************************************************
   {
-
     _reco_algo_v.clear();
-
-    _ped_nsample_cosmic = 1;
-
-    _ped_nsample_beam   = 8;
-
-    _ped_method = kHEAD;
-
   }
 
   //***************************************************************
@@ -31,86 +24,68 @@ namespace pmtana{
   //***************************************************************
   {}
 
-  //***************************************************************
-  bool PulseRecoManager::RecoPulse(const std::vector<short> &fifo) const
-  //***************************************************************
+  //************************************************************************************
+  void PulseRecoManager::AddRecoAlgo (PMTPulseRecoBase* algo, PMTPedestalBase* ped_algo)
+  //************************************************************************************
   {
-    bool status = true;
-
-    //
-    // Step 0: skipe 0-length waveform with a warning message
-    //    
-    if(fifo.size()<1){
-      
-      std::cerr <<"Found 0-length waveform vector!" << std::endl;
-
-      return false;
-    }
+    if(!algo) throw OpticalRecoException("Invalid PulseReco algorithm!");
     
-    //
-    // Step 1: apply pedestal estimation
-    //  
-    double ped_mean = 0;
-    double sigma  = 0;
-    // Figure out whether this is a beam readout or not
-    size_t ped_nsample = ( is_beam(fifo) ? _ped_nsample_beam : _ped_nsample_cosmic);
-    
-    switch(_ped_method){
+     _reco_algo_v.push_back(std::make_pair(algo,ped_algo));
+  }
+  
+  //**************************************************************
+  void PulseRecoManager::SetDefaultPedAlgo (PMTPedestalBase* algo)
+  //**************************************************************
+  {
+    if(!algo) throw OpticalRecoException("Invalid Pedestal algorithm!");
+    _ped_algo = algo;
+  };
 
-    case kHEAD:
+  //**********************************************************************
+  bool PulseRecoManager::Reconstruct(const pmtana::Waveform_t &wf) const
+  //**********************************************************************
+  {
+    if(_reco_algo_v.empty() && !_ped_algo)
+
+      throw OpticalRecoException("No Pulse/Pedestal reconstruction to run!");
+
+    bool ped_status = true;
+    
+    if(_ped_algo)
       
-      _ped_algo.ComputePedestal(fifo, 0, ped_nsample);
-      
-      ped_mean = _ped_algo.Mean();
-      
-      sigma  = _ped_algo.Sigma();
-      
-      break;
-      
-    case kTAIL:
-      
-      _ped_algo.ComputePedestal(fifo, (fifo.size()-ped_nsample), ped_nsample);
-      
-      ped_mean = _ped_algo.Mean();
-      
-      sigma  = _ped_algo.Sigma();
-      
-      break;
-      
-    case kBOTH:
-      
-      _ped_algo.ComputePedestal(fifo, 0, ped_nsample);
-      
-      ped_mean = _ped_algo.Mean();
-      
-      sigma  = _ped_algo.Sigma();
-      
-      _ped_algo.ComputePedestal(fifo, (fifo.size()-ped_nsample), ped_nsample);
-      
-      if( sigma > _ped_algo.Sigma() ) {
+      ped_status = _ped_algo->Evaluate(wf);
+
+    bool pulse_reco_status = ped_status;
+
+    for(auto& algo_pair : _reco_algo_v) {
+
+      auto& pulse_algo = algo_pair.first;
+      auto& ped_algo   = algo_pair.second;
+
+      if(ped_algo) {
+
+	ped_status = ped_status && ped_algo->Evaluate(wf);
+
+	pulse_reco_status = ( ped_status &&
+			      pulse_reco_status &&
+			      pulse_algo->Reconstruct( wf, ped_algo->Mean(), ped_algo->Sigma() )
+			      );
+
+      } else {
+
+	if( !_ped_algo ) {
+	  std::stringstream ss;
+	  ss << "No pedestal algorithm available for pulse algo " << pulse_algo->Name();
+	  throw OpticalRecoException(ss.str());
+	}
 	
-	ped_mean = _ped_algo.Mean();
-	
-	sigma  = _ped_algo.Sigma();
-	
+	pulse_reco_status = ( pulse_reco_status &&
+			      pulse_algo->Reconstruct( wf, _ped_algo->Mean(), _ped_algo->Sigma() )
+			      );
       }
-      
-      break;
     }
-    
-    //
-    // Step 2: apply reco algos
-    //
-    for(auto reco_algo : _reco_algo_v){
-      
-      reco_algo->SetPedMean(ped_mean);
-      
-      reco_algo->SetPedRMS (sigma);
-      
-      status = status && reco_algo->RecoPulse(fifo);
-
-    } // end of reco algorithm loop
-    return status;
+	
+    return pulse_reco_status;
   
   }
 

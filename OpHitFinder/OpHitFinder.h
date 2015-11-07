@@ -55,13 +55,6 @@ namespace larlite {
     
     const std::vector<pmtana::pulse_param>& Reconstruct(const std::vector<short>& wf);
 
-    // const std::pair< std::vector<double>,
-    // 		     std::vector<double> > ReconstructBaseline(const std::vector<short>& wf,
-    // 							       const int ws);
-    
-    const std::pair<double,double> ReconstructBaseline(const std::vector<short>& wf,
-						       const int ws);
-
     const std::vector<double> CFTrace(const std::vector<short>& wf,
 				      const float    F,
 				      const unsigned D,
@@ -82,18 +75,10 @@ namespace larlite {
     double _spe_size;
     bool _verbose;
     ::pmtana::PMTPulseRecoBase* _preco_alg;
-
+    ::pmtana::PMTPedestalBase* _ped_alg;
   private:
 
-    template<typename T>
-    std::vector<std::vector<T> > windows(const std::vector<T>& thing,
-					 const int window_size) const;
-
-    const double get_max (const std::vector<double>& v ,int bins) const;
-
     template<typename W> int sign(W val) const;
-      
-
   };
 }
 #endif

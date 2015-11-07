@@ -35,31 +35,24 @@ namespace pmtana
   public:
 
     /// Default constructor
-    AlgoThreshold();
+    AlgoThreshold(const std::string name="AlgoThreshold");
 
     /// Alternative constructor
-    //AlgoThreshold(const fhicl::ParameterSet &pset);
-    AlgoThreshold(const ::fcllite::PSet &pset);
+    //AlgoThreshold(const fhicl::ParameterSet &pset,const std::string name="AlgoThreshold");
+    AlgoThreshold(const ::fcllite::PSet &pset,const std::string name="AlgoThreshold");
 
     /// Default destructor
     virtual ~AlgoThreshold();
-
-    /// Implementation of AlgoThreshold::reco() method
-    virtual bool RecoPulse(const std::vector<short> &wf);
     
     /// Implementation of AlgoThreshold::reset() method
-    virtual void Reset();
+    void Reset();
 
-    /// A method to set user-defined ADC threshold value
-    void SetADCThreshold(double v) {_adc_thres = v;};
-
-    /** 
-      A method to set a multiplication factor to the pedestal standard deviation
-      which is used as one of two input values to define a threshold.
-    */
-    void SetNSigma(double v) {_nsigma = v;};
-  
   protected:
+
+    /// Implementation of AlgoThreshold::reco() method
+    bool RecoPulse(const pmtana::Waveform_t& wf,
+		   const pmtana::PedestalMean_t& mean_v,
+		   const pmtana::PedestalSigma_t& sigma_v);
 
     /// A variable holder for a user-defined absolute ADC threshold value
     double _adc_thres;

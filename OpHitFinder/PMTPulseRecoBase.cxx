@@ -11,33 +11,46 @@
 
 namespace pmtana{
 
-  //##################################
-  PMTPulseRecoBase::PMTPulseRecoBase()
-  //##################################
-  {
+  //*************************************************************************
+  PMTPulseRecoBase::PMTPulseRecoBase(const std::string name) : _name   (name)
+							     , _status (true)
+  //*************************************************************************
+  { Reset(); }
 
-    _ped_mean = _ped_rms = -1;
+  //***********************************************
+  const std::string& PMTPulseRecoBase::Name() const
+  //***********************************************
+  { return _name; }
 
-    Reset();
-
-  }
+  //*****************************************
+  const bool PMTPulseRecoBase::Status() const
+  //*****************************************
+  { return _status; }
 
   //***************************************************************
   PMTPulseRecoBase::~PMTPulseRecoBase()
   //***************************************************************
   {}
 
-  //***************************************************************
+  //******************************************************************
+  bool PMTPulseRecoBase::Reconstruct( const Waveform_t& wf,
+				      const PedestalMean_t& mean_v,
+				      const PedestalSigma_t& sigma_v )
+  //******************************************************************
+  {
+    _status = this->RecoPulse(wf,mean_v,sigma_v);
+    return _status;
+  }
+  
+  //*****************************************************************************
   bool CheckIndex(const std::vector<short> &wf, const size_t &begin, size_t &end)
-  //***************************************************************
+  //*****************************************************************************
   {
     if(begin >= wf.size() || end >= wf.size() || begin > end){
 
-      std::cerr << Form("Invalid arguments: waveform length = %zu, begin = %zu, end = %zu!",
-			wf.size(), begin, end)
-		<< std::endl;
-      return false;
+      std::cerr <<"Invalid arguments: waveform length = " << wf.size() << " begin = " << begin << " end = " << end << std::endl;
 
+      return false;
     }
 
     if(!end) end = wf.size() - 1;
@@ -54,7 +67,6 @@ namespace pmtana{
     _pulse_v.clear();
 
     _pulse_v.reserve(3);
-  
   }
 
   //***************************************************************
@@ -77,7 +89,7 @@ namespace pmtana{
   }
 
   //***************************************************************
-  const std::vector<pmtana::pulse_param>& PMTPulseRecoBase::GetPulses() const
+  const pulse_param_array& PMTPulseRecoBase::GetPulses() const
   //***************************************************************
   {
     return _pulse_v;

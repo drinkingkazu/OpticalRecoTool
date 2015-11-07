@@ -11,19 +11,21 @@
 
 namespace pmtana{
 
-  //############################
-  AlgoThreshold::AlgoThreshold()
-  //############################
+  //***************************************************************************
+  AlgoThreshold::AlgoThreshold(const std::string name) : PMTPulseRecoBase(name)
+  //***************************************************************************
   {
     _adc_thres = 3;
     _nsigma = 5;
     Reset();
   }
 
-  //############################################################
-  //AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset)
-  AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset)
-  //############################################################
+  //************************************************************
+  //AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset,
+  AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset,
+			       const std::string name)
+    : PMTPulseRecoBase(name)
+  //*******************************************************
   {
 
     _adc_thres = pset.get<double>("ADCThreshold");
@@ -47,16 +49,21 @@ namespace pmtana{
   }
 
   //***************************************************************
-  bool AlgoThreshold::RecoPulse(const std::vector<short> &wf)
+  bool AlgoThreshold::RecoPulse(const Waveform_t&wf,
+				const PedestalMean_t& mean_v,
+				const PedestalSigma_t& sigma_v)
   //***************************************************************
   {
     bool fire = false;
     
     double counter=0;
 
-    double threshold = ( _adc_thres > (_nsigma * _ped_rms) ? _adc_thres : (_nsigma * _ped_rms) );
+    double ped_mean = mean_v.front();
+    double ped_rms  = sigma_v.front();
 
-    threshold += _ped_mean;
+    double threshold = ( _adc_thres > (_nsigma * ped_rms) ? _adc_thres : (_nsigma * ped_rms) );
+
+    threshold += ped_mean;
 
     Reset();
 
@@ -70,8 +77,8 @@ namespace pmtana{
 
 	fire = true;
 
-	_pulse.ped_mean  = _ped_mean;
-	_pulse.ped_sigma = _ped_rms;
+	_pulse.ped_mean  = ped_mean;
+	_pulse.ped_sigma = ped_rms;
 	_pulse.t_start = counter;
 
       }
@@ -97,13 +104,13 @@ namespace pmtana{
 
 	// Add this adc count to the integral
 
-	_pulse.area += ((double)value - (double)_ped_mean);
+	_pulse.area += ((double)value - (double)ped_mean);
 
-	if(_pulse.peak < ((double)value - (double)_ped_mean)) {
+	if(_pulse.peak < ((double)value - (double)ped_mean)) {
 
 	  // Found a new maximum
 	  
-	  _pulse.peak = ((double)value - (double)_ped_mean);
+	  _pulse.peak = ((double)value - (double)ped_mean);
 
 	  _pulse.t_max = counter;
 
@@ -131,7 +138,7 @@ namespace pmtana{
     return true;
 
   }
-
+  
 }
 
 #endif

@@ -22,10 +22,6 @@ SlidingWindow:
     NSigmaThreshold: 5
     EndADCThreshold: 2
     EndNSigmaThreshold: 1
-    MinWindowSize:   5
-    MaxSigma:        1.0
-    PedRangeMax:     2150
-    PedRangeMin:     100
     Verbosity:       false
 }
 
@@ -44,6 +40,21 @@ SlidingWindowTwo:
     Verbosity:       false
 }
 
+PedEdges:
+{
+    NumSampleFront: 5
+    NumSampleTail:  5
+    Method:         2
+}
+
+PedTruncatedMean:
+{
+    SampleSize:      2
+    MaxSigma:        1.0
+    PedRangeMax:     2150
+    PedRangeMin:     100
+}
+
 OpHitFinder:
 {
   module_type: "OpHitFinder"
@@ -53,6 +64,8 @@ OpHitFinder:
   SPESize: 118
   Verbosity: false
  #  HitAlgoPset: @local::standard_algo_fixedwindow
-   HitFinder: SlidingWindow
+  HitFinder: SlidingWindow
+#  Pedestal:  PedTruncatedMean
+  Pedestal:  PedEdges
  #  HitFinder: SlidingWindowTwo
 }

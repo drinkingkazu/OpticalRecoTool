@@ -31,48 +31,32 @@ namespace pmtana
   public:
 
     /// Default constructor
-    //AlgoSlidingWindow(const fhicl::ParameterSet &pset);
-    AlgoSlidingWindow(const ::fcllite::PSet &pset);
+    AlgoSlidingWindow(const std::string name="SlidingWindow");
+
+    /// Alternative ctor
+    //AlgoSlidingWindow(const fhicl::ParameterSet &pset,const std::string name="SlidingWindow");
+    AlgoSlidingWindow(const ::fcllite::PSet &pset,const std::string name="SlidingWindow");
 
     /// Default destructor
     virtual ~AlgoSlidingWindow();
-
-    /// Implementation of AlgoSlidingWindow::reco() method
-    virtual bool RecoPulse(const std::vector<short> &wf);
     
     /// Implementation of AlgoSlidingWindow::reset() method
-    virtual void Reset();
+    void Reset();
 
-    bool ConstructPedestal(const std::vector<short> &wf);
-
-    /// A method to set user-defined ADC threshold value
-    void SetADCSlidingWindow(double v) {_adc_thres = v;};
-
-    /** 
-      A method to set a multiplication factor to the pedestal standard deviation
-      which is used as one of two input values to define a threshold.
-    */
-    void SetNSigma(double v) {_nsigma = v;};
-
-    void SetMinWindowSize(size_t v) {_min_wf_size = v;}
-
-    void SetMaxSigma(float v) {_max_sigma = v;}
-  
   protected:
 
+    /// Implementation of AlgoSlidingWindow::reco() method
+    bool RecoPulse(const pmtana::Waveform_t&,
+		   const pmtana::PedestalMean_t&,
+		   const pmtana::PedestalSigma_t&);
+    
     /// A variable holder for a user-defined absolute ADC threshold value
     float _adc_thres, _end_adc_thres;
 
     /// A variable holder for a multiplicative factor for the pedestal standard deviation to define the threshold.
     float _nsigma, _end_nsigma;
     bool _verbose;
-    size_t _min_wf_size, _num_presample;
-    float  _max_sigma;
-    float  _ped_range_max;
-    float  _ped_range_min;
-    std::vector<float> _local_mean;
-    std::vector<float> _local_sigma;
-  
+    size_t _num_presample;
   };
 
 }

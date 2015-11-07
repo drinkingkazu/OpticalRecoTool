@@ -19,16 +19,9 @@
 //#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "PMTPulseRecoBase.h"
-#include "AlgoPedestal.h"
+#include "PMTPedestalBase.h"
 namespace pmtana
 {
-
-  /// enum to define ped_estimator algorithm options
-  enum PED_METHOD{
-    kHEAD = 0, ///< Use first N samples
-    kTAIL,     ///< Use last N samples
-    kBOTH      ///< Calculate both and use the one with smaller RMS
-  };
 
   /**
    \class PulseRecoManager
@@ -47,39 +40,21 @@ namespace pmtana
     ~PulseRecoManager();
 
     /// Implementation of ana_base::analyze method
-    bool RecoPulse(const std::vector<short>& fifo) const;
+    bool Reconstruct(const pmtana::Waveform_t&) const;
 
     /// A method to set pulse reconstruction algorithm
-    void AddRecoAlgo          (PMTPulseRecoBase* algo) { _reco_algo_v.push_back(algo); };
+    void AddRecoAlgo (pmtana::PMTPulseRecoBase* algo, PMTPedestalBase* ped_algo=nullptr);
   
     /// A method to set a choice of pedestal estimation method
-    void SetPedAlgo           (PED_METHOD type) { _ped_method = type; };
-
-    /// A method to set # of ADC samples to be used for a cosmic readout
-    void SePedSampleCosmic (size_t n) { _ped_nsample_cosmic = n; };
-
-    /// A method to set # of ADC samples to be used for a beam readout
-    void SetPedSampleBeam   (size_t n) { _ped_nsample_beam   = n; };
+    void SetDefaultPedAlgo (pmtana::PMTPedestalBase* algo);
 
   private:
 
     /// pulse reconstruction algorithm pointer
-    std::vector<PMTPulseRecoBase*> _reco_algo_v;
+    std::vector<std::pair<pmtana::PMTPulseRecoBase*,pmtana::PMTPedestalBase*> > _reco_algo_v;
 
     /// ped_estimator object
-    AlgoPedestal _ped_algo;
-
-    /// # samples to be used for pedestal estimation of cosmic readout
-    size_t _ped_nsample_cosmic;
-
-    /// # samples to be used for pedestal estimation of beam readout
-    size_t _ped_nsample_beam;
-
-    /// Enum value to be set by a user for the pedestal estimation method.
-    PED_METHOD _ped_method;
-
-    /// A method to judge whether the subject waveform corresponds to a beam readout or not
-    inline bool is_beam(const std::vector<short> &wf) const {return (wf.size() > 1000);};
+    PMTPedestalBase* _ped_algo;
 
   };
 }

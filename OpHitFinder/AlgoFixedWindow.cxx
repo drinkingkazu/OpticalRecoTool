@@ -11,9 +11,9 @@
 
 namespace pmtana{
 
-  //################################
-  AlgoFixedWindow::AlgoFixedWindow()
-  //################################
+  //*******************************************************************************
+  AlgoFixedWindow::AlgoFixedWindow(const std::string name) : PMTPulseRecoBase(name)
+  //*******************************************************************************
   {
     Reset();
 
@@ -22,10 +22,12 @@ namespace pmtana{
     _index_end = 0;
   }
 
-  //###############################################################
-  //AlgoFixedWindow::AlgoFixedWindow(const fhicl::ParameterSet &pset)
-  AlgoFixedWindow::AlgoFixedWindow(const ::fcllite::PSet & pset)
-  //###############################################################
+  //****************************************************************************************
+  //AlgoFixedWindow::AlgoFixedWindow(const fhicl::ParameterSet &pset, const std::string name,
+  AlgoFixedWindow::AlgoFixedWindow(const ::fcllite::PSet& pset,
+				   const std::string name)
+    : PMTPulseRecoBase(name)
+  //****************************************************************************************
   {
     Reset();
 
@@ -52,16 +54,18 @@ namespace pmtana{
   }
 
   //***************************************************************
-  bool AlgoFixedWindow::RecoPulse(const std::vector<short> &wf)
+  bool AlgoFixedWindow::RecoPulse(const Waveform_t& wf,
+				  const PedestalMean_t& mean_v,
+				  const PedestalSigma_t& sigma_v)
   //***************************************************************
   {
     this->Reset();
 
     _pulse_v[0].t_start = (double)(_index_start);
 
-    _pulse_v[0].ped_mean  = _ped_mean;
+    _pulse_v[0].ped_mean  = mean_v.front();
 
-    _pulse_v[0].ped_sigma = _ped_rms;
+    _pulse_v[0].ped_sigma = sigma_v.front();
 
     if(!_index_end)
 
@@ -73,11 +77,11 @@ namespace pmtana{
 
     _pulse_v[0].t_max = PMTPulseRecoBase::Max(wf, _pulse_v[0].peak, _index_start, _index_end);
 
-    _pulse_v[0].peak -= _ped_mean;
+    _pulse_v[0].peak -= mean_v.front();
 
     PMTPulseRecoBase::Integral(wf, _pulse_v[0].area, _index_start, _index_end);
 
-    _pulse_v[0].area = _pulse_v[0].area - ( _pulse_v[0].t_end - _pulse_v[0].t_start + 1) * _ped_mean;
+    _pulse_v[0].area = _pulse_v[0].area - ( _pulse_v[0].t_end - _pulse_v[0].t_start + 1) * mean_v.front();
 
     return true;
 

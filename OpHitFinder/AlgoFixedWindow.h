@@ -34,29 +34,25 @@ namespace pmtana
 
   public:
 
-    /// Default constructor
-    AlgoFixedWindow();
+    /// Default ctor
+    AlgoFixedWindow(const std::string name="FixedWindow");
     
     /// Alternative ctor
-    //AlgoFixedWindow(const fhicl::ParameterSet &pset);
-    AlgoFixedWindow(const ::fcllite::PSet &pset);
+    //AlgoFixedWindow(const fhicl::ParameterSet &pset,const std::string name="FixedWindow");
+    AlgoFixedWindow(const ::fcllite::PSet &pset,const std::string name="FixedWindow");
 
     /// Default destructor
     virtual ~AlgoFixedWindow();
-
-    /// Implementation of AlgoFixedWindow::reco() method
-    virtual bool RecoPulse(const std::vector<short> &wf);
     
     /// Implementation of AlgoFixedWindow::reset() method
-    virtual void Reset();
+    void Reset();
 
-    /// Specify the beginning of fixed pulse time window
-    void SetStartSample(size_t index) {_index_start = index;};
-
-    /// Specify the end of fixed pulse time window
-    void SetEndSample  (size_t index) {_index_end   = index;};
-  
   protected:
+
+    /// Implementation of AlgoFixedWindow::reco() method
+    bool RecoPulse(const pmtana::Waveform_t&,
+		   const pmtana::PedestalMean_t&,
+		   const pmtana::PedestalSigma_t&);
 
     size_t _index_start; ///< index marker for the beginning of the pulse time window
     size_t _index_end;   ///< index marker for the end of pulse time window
