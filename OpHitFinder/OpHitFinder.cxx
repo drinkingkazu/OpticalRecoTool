@@ -173,18 +173,30 @@ namespace larlite {
 
     /// we are going to lose D values of of each end since we go left to right
     /// later we can go the other direction
-    for (unsigned k = D; k < wf.size(); ++k) 
-      
-      cfd.push_back(F * (float) wf.at(k) - (float) wf.at(k - D););
+    for (unsigned k = 0; k < wf.size(); ++k)  {
+      auto delayed = F *  ( (float) wf.at(k) );
+      if (k < D)
+	cfd.push_back( -1.0 * delayed);
+      else
+	cfd.push_back(-1.0 * delayed +  ( (float) wf.at(k - D) ) );
+    }
     
     //temporary, extend vector to match length of usual one
-    while(cfd.size() < wf.size())
+    // while(cfd.size() < wf.size())
 
-      cfd.push_back(cfd.back());
+    //   cfd.push_back(cfd.back());
     
     return cfd;
   }
   
+  // const double OpHitFinder::LinearZeroPointX(const std::vector<W>& trace) const {
+
+  //   auto x = double{0.0};
+    
+    
+    
+  //   return x;
+  // }
   
   // const std::pair< std::vector<double>,
   // 		   std::vector<double> > OpHitFinder::ReconstructBaseline(const std::vector<short>& wf,
