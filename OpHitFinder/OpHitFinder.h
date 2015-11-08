@@ -67,7 +67,7 @@ namespace larlite {
 				      const double ped) const;
 
     //const double LinearZeroPointX(const std::vector<double>& trace) const;
-    const std::map<unsigned,double> LinearZeroPointX(const std::vector<double>& trace) const;
+    const std::map<unsigned,double> LinearZeroPointXX(const std::vector<double>& trace);
   protected:
     
     // config file
@@ -81,10 +81,9 @@ namespace larlite {
     double _spe_size;
     bool _verbose;
     ::pmtana::PMTPulseRecoBase* _preco_alg;
-    ::pmtana::PMTPedestalBase* _ped_alg;
+    ::pmtana::PMTPedestalBase*  _ped_alg;
   private:
 
-    template<typename W> int sign(W val) const;
   };
 }
 #endif

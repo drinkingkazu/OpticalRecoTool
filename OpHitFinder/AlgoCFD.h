@@ -31,7 +31,7 @@ namespace pmtana
   public:
 
     /// Default constructor
-    AlgoCFD(const std::string name="SlidingWindow");
+    AlgoCFD(const std::string name="CFD");
 
     /// Alternative ctor
     //AlgoCFD(const fhicl::ParameterSet &pset,const std::string name="SlidingWindow");
@@ -50,13 +50,12 @@ namespace pmtana
 		   const pmtana::PedestalMean_t&,
 		   const pmtana::PedestalSigma_t&);
     
-    // /// A variable holder for a user-defined absolute ADC threshold value
-    // float _adc_thres, _end_adc_thres;
 
-    // /// A variable holder for a multiplicative factor for the pedestal standard deviation to define the threshold.
-    // float _nsigma, _end_nsigma;
-    // bool _verbose;
-    // size_t _num_presample;
+    const std::map<unsigned,double> LinearZeroPointX(const std::vector<double>& trace);
+    
+  private:
+
+
   };
 
 }

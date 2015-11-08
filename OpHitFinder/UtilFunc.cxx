@@ -7,6 +7,7 @@
 #include <numeric>
 #include <cmath>
 #include <iostream>
+
 namespace pmtana {
 
   double mean(const std::vector<short>& wf, size_t start, size_t nsample)
@@ -75,6 +76,18 @@ namespace pmtana {
     return (mean_max_occurrence / num_occurrence);
   }
 
+  
+  // template<typename W>
+  int sign(double val) {
+    
+    if (val > 0) return  1;
+    if (val < 0) return -1;
+    return 0;
+    
+  }
+  
+  
+  
 }
 
 #endif

@@ -2,20 +2,22 @@
 #define LARLITE_OPHITFINDER_CXX
 
 #include "OpHitFinder.h"
+
 #include "DataFormat/ophit.h"
 #include "DataFormat/opdetwaveform.h"
 #include "DataFormat/trigger.h"
 #include "LArUtil/TimeService.h"
 #include "LArUtil/Geometry.h"
+
 #include "AlgoThreshold.h"
 #include "AlgoSlidingWindow.h"
-//#include "AlgoSlidingWindowTwo.h"
 #include "AlgoFixedWindow.h"
 #include "PedAlgoEdges.h"
 #include "PedAlgoTruncatedMean.h"
 #include "PedAlgoRollingMean.h"
 #include "PedAlgoCD.h"
 #include "OpticalRecoException.h"
+#include "UtilFunc.h"
 
 namespace larlite {
 
@@ -221,7 +223,7 @@ namespace larlite {
   }
   
   //const double OpHitFinder::LinearZeroPointX(const std::vector<double>& trace) const {
-  const std::map<unsigned,double> OpHitFinder::LinearZeroPointX(const std::vector<double>& trace) const {
+  const std::map<unsigned,double> OpHitFinder::LinearZeroPointXX(const std::vector<double>& trace) {
 
      auto x = double{0.0};
      std::map<unsigned,double> crossing;
@@ -229,8 +231,8 @@ namespace larlite {
 
      for ( unsigned i = 0; i < trace.size() - 1; ++i) {
 
-       auto si = sign(trace.at(i));
-       auto sf = sign(trace.at(i+1));
+       auto si = ::pmtana::sign(trace.at(i));
+       auto sf = ::pmtana::sign(trace.at(i+1));
 
        if ( si == sf ) //no sign flip, no zero cross
 	 continue;
@@ -244,20 +246,18 @@ namespace larlite {
        
      }
      
-     // for (const auto& m : crossing )
-     //   std::cout << "index: "  << m.first << " X intercept: " << m.second << "\n";
      return crossing;
      //return x;
   }
   
-  template<typename W>
-  int OpHitFinder::sign(W val) const{
+  // template<typename W>
+  // int OpHitFinder::sign(W val) const{
     
-    if (val > 0) return  1;
-    if (val < 0) return -1;
-    return 0;
+  //   if (val > 0) return  1;
+  //   if (val < 0) return -1;
+  //   return 0;
     
-  }
+  // }
 
   bool OpHitFinder::finalize() {
 
