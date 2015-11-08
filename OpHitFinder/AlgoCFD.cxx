@@ -102,26 +102,35 @@ namespace pmtana{
 
 	//go backward from CDF 
 	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+
 	  i--;
+
+	  //watch the edge
 	  if ( i < 0 ) {
 	    i = 0;
 	    break;
 	  }
+	  
 	}
-	_pulse.t_start = i;
-	i++;
-
+	_pulse.t_start = i; //taking one extra sample as end of pulse
+    	  
 	//go forward from start point
 	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+
+	  _pulse.area += wf.at(i);
 	  i++;
+
+	  //watch for the edge again
 	  if ( i > wf.size() - 1 ) {
 	    i = wf.size() - 1;
+	    _pulse.area += wf.at(i);
 	    break;
 	  }
+	  
 	}
 	
 	
-	_pulse.t_end = i;
+	_pulse.t_end = i; //taking one extra sample as end of pulse again
 	auto it = std::max_element(std::begin(wf) + _pulse.t_start, std::begin(wf) + _pulse.t_end);
 
 	_pulse.t_max    = it - std::begin(wf);
