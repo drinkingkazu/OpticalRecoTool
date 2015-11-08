@@ -86,6 +86,7 @@ namespace pmtana{
 
     }
 
+    // has to be high, very high pulses still need decent binning
     unsigned nbins = 1000;  
 
     //////////////////seg faulting...
@@ -96,11 +97,11 @@ namespace pmtana{
     auto mode_sigma = get_max(sigma_v,nbins);
 
     double threshold = 4;
+    unsigned range   = 5;
+    double divisions = 4.0;
     
     size_t i = 0;
     int    s = 0;
-
-    unsigned n_samples_before = 5; // might use?
 
     while ( i < wf.size() ) {
       
@@ -112,14 +113,12 @@ namespace pmtana{
 
 	//wasn't good in past, lets catch up and fix as we go
     	while ( s < i ) {
-    	  mean_v [s] = floor(mode_mean) + (double) ( rand() % (unsigned) 5) / 4.0;
+    	  mean_v [s] = floor(mode_mean) + (double) ( rand() % range) / divisions;
     	  sigma_v[s] = mode_sigma;
-	  
     	  s++;
     	}
 
-    	s = i;
-    	++s;
+    	s = i + 1;
       }
       
       i++;

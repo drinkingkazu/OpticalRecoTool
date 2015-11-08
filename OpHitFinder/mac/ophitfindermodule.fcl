@@ -63,6 +63,11 @@ PedRollingMean:
     PedRangeMin:     100
 }
 
+PedCD :
+{
+
+}
+
 OpHitFinder:
 {
   module_type: "OpHitFinder"
@@ -71,10 +76,15 @@ OpHitFinder:
   UseArea: true
   SPESize: 118
   Verbosity: false
- #  HitAlgoPset: @local::standard_algo_fixedwindow
+
+  # HitAlgoPset: @local::standard_algo_fixedwindow
+
   HitFinder: SlidingWindow
-#    Pedestal:  PedTruncatedMean
-      Pedestal:  PedRollingMean
-#  Pedestal:  PedEdges
- #  HitFinder: SlidingWindowTwo
+
+  #  Pedestal:  PedTruncatedMean
+  #  Pedestal:  PedRollingMean
+  #  Pedestal:  PedEdges
+  #  HitFinder: SlidingWindowTwo
+
+  Pedestal: PedCD
 }

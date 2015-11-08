@@ -14,6 +14,7 @@
 #include "PedAlgoEdges.h"
 #include "PedAlgoTruncatedMean.h"
 #include "PedAlgoRollingMean.h"
+#include "PedAlgoCD.h"
 #include "OpticalRecoException.h"
 
 namespace larlite {
@@ -69,15 +70,16 @@ namespace larlite {
     std::string ped_alg_name = p.get<std::string>("Pedestal");
 
     auto const ped_pset = main_cfg.get_pset(ped_alg_name);
-
+    
     if(ped_alg_name == "PedEdges")
       _ped_alg = new pmtana::PedAlgoEdges(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedTruncatedMean")
       _ped_alg = new pmtana::PedAlgoTruncatedMean(ped_pset,ped_alg_name);
-    else if(ped_alg_name == "PedRollingMean") {
+    else if(ped_alg_name == "PedRollingMean") 
       _ped_alg = new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name);
-      std::cout << ped_alg_name << std::endl;
-    }
+    else if(ped_alg_name == "PedCD") 
+      _ped_alg = new pmtana::PedAlgoCD(ped_pset,ped_alg_name);
+    
     
     else {
       std::stringstream ss;
@@ -92,7 +94,7 @@ namespace larlite {
   
   bool OpHitFinder::analyze(storage_manager* storage) {
 
-    auto const wfHandle = storage->get_data<event_opdetwaveform>(_producer);
+    auto const wfHandle   = storage->get_data<event_opdetwaveform>(_producer);
     auto const trigHandle = storage->get_data<trigger>(_trigger_producer);
     
     if (!wfHandle || wfHandle->empty()) {
@@ -162,10 +164,10 @@ namespace larlite {
       }
     }
     //e.put(std::move(ophits));
-  
+    
     return true;
   }
-
+  
   bool OpHitFinder::Reconstruct(const std::vector<short>& wf)
   {
 
