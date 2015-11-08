@@ -23,19 +23,18 @@ namespace pmtana{
   AlgoCFD::AlgoCFD(const ::fcllite::PSet &pset,
 		   const std::string name)
     : PMTPulseRecoBase(name)
-  //*********************************************************************
+      //*********************************************************************
   {
 
+    _F = pset.get<float>("Fraction");
+    _D = pset.get<int>  ("Delay");
+    
+    
     // _adc_thres = pset.get<float>("ADCThreshold");
-
     // _end_adc_thres = pset.get<float>("EndADCThreshold");
-  
     // _nsigma = pset.get<float>("NSigmaThreshold");
-
     // _end_nsigma = pset.get<float>("EndNSigmaThreshold");
-
     // _verbose = pset.get<bool>("Verbosity");
-
     // _num_presample = pset.get<size_t>("NumPreSample");
 
     Reset();
@@ -61,35 +60,78 @@ namespace pmtana{
   //***************************************************************
   {
 
-
+    Reset();
   // const std::vector<double> OpHitFinder::CFTrace(const std::vector<short>& wf,
   // 						 const float F,
   // 						 const unsigned D,
   // 						 const double ped) const {
     
-    auto F   = 0;
-    auto D   = 0;
     auto ped = 0;
+
     std::vector<double> cfd; cfd.reserve(wf.size());
 
     /// we are going to lose D values of of each end since we go left to right
     /// later we can go the other direction
     for (unsigned k = 0; k < wf.size(); ++k)  {
       
-      auto delayed = F *  ( (float) wf.at(k) - ped);
+      auto delayed = -1.0 * _F *  ( (float) wf.at(k) - mean_v.at(k) );
 
-      if (k < D)
+      if (k < _D)
 	
-	cfd.push_back( -1.0 * delayed);
+	cfd.push_back( delayed );
 
       else
 
-	cfd.push_back( -1.0 * delayed +  ( (float) wf.at(k - D) - ped ) );
+	cfd.push_back(delayed +  ( (float) wf.at(k - _D) - mean_v.at(k) ) );
     }
+
+
+    //Get the zero point crossings, how can I tell which are meaningful?
+    //go to each crossing, see if waveform is above pedestal (high above pedestal
+    auto crossings = LinearZeroPointX(cfd);
+    auto threshold = 5.0;
     
-    
-    //   return cfd;
-    // }
+    for(const auto& cross : crossings) {
+
+      if( wf.at( cross.first ) > sigma_v.at( cross.first ) * threshold +  mean_v.at( cross.first ) ) {
+	
+	//we are inside a true pulse, look backward until we go back to baseline...
+	_pulse.reset_param();
+
+	int i = cross.first;
+
+	//go backward from CDF 
+	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	  i--;
+	  if ( i < 0 ) {
+	    i = 0;
+	    break;
+	  }
+	}
+	_pulse.t_start = i;
+	i++;
+
+	//go forward from start point
+	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	  i++;
+	  if ( i > wf.size() - 1 ) {
+	    i = wf.size() - 1;
+	    break;
+	  }
+	}
+	
+	
+	_pulse.t_end = i;
+	auto it = std::max_element(std::begin(wf) + _pulse.t_start, std::begin(wf) + _pulse.t_end);
+
+	_pulse.t_max    = it - std::begin(wf);
+	_pulse.peak     = *it;
+	_pulse.ped_mean = 2048; // keep it constant for now until we change struct.
+	
+	_pulse_v.push_back(_pulse);
+      }
+      
+    }
     
     
     return true;
@@ -115,10 +157,11 @@ namespace pmtana{
 
       //calculate the crossing X based on linear interpolation bt two pts
 
+
       crossing[i] = (double) i - trace.at(i) * ( 1.0 / ( trace.at(i+1) - trace.at(i) ) );
-       
+      
     }
-     
+    
 
     return crossing;
 

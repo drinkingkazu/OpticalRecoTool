@@ -54,8 +54,9 @@ namespace pmtana
     const std::map<unsigned,double> LinearZeroPointX(const std::vector<double>& trace);
     
   private:
-
-
+    float _F;
+    int   _D;
+    
   };
 
 }

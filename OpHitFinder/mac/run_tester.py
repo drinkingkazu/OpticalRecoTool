@@ -94,7 +94,7 @@ for entry in xrange(ch.GetEntries()):
             span_xmin = p.t_start
             span_xmax = p.t_end
 
-            span_ymax = p.peak + p.ped_mean
+            span_ymax = p.peak# + p.ped_mean
             span_ymin = p.ped_mean
             
             

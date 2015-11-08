@@ -12,6 +12,8 @@
 #include "AlgoThreshold.h"
 #include "AlgoSlidingWindow.h"
 #include "AlgoFixedWindow.h"
+#include "AlgoCFD.h"
+
 #include "PedAlgoEdges.h"
 #include "PedAlgoTruncatedMean.h"
 #include "PedAlgoRollingMean.h"
@@ -61,8 +63,9 @@ namespace larlite {
       _preco_alg = new pmtana::AlgoFixedWindow(hit_pset,hit_alg_name);
     else if(hit_alg_name == "SlidingWindow")
       _preco_alg = new pmtana::AlgoSlidingWindow(hit_pset,hit_alg_name);
-    //else if(hit_alg_name == "SlidingWindowTwo")
-    //_preco_alg = new pmtana::AlgoSlidingWindowTwo(hit_pset,hit_alg_name);
+    else if(hit_alg_name == "CFD")
+      _preco_alg = new pmtana::AlgoCFD(hit_pset,hit_alg_name);
+
     else {
       std::stringstream ss;
       ss << "Invalid PulseReco algorithm name: " << hit_alg_name;

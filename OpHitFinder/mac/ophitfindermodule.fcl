@@ -74,6 +74,12 @@ PedCD :
 
 }
 
+CFD:
+{
+   Fraction: 0.9
+   Delay: 2
+
+}
 OpHitFinder:
 {
   module_type: "OpHitFinder"
@@ -85,7 +91,7 @@ OpHitFinder:
 
   # HitAlgoPset: @local::standard_algo_fixedwindow
 
-  HitFinder: SlidingWindow
+  #HitFinder: SlidingWindow
 
   #  Pedestal:  PedTruncatedMean
   #  Pedestal:  PedRollingMean
@@ -93,4 +99,5 @@ OpHitFinder:
   #  HitFinder: SlidingWindowTwo
 
   Pedestal: PedCD
+  HitFinder: CFD
 }
