@@ -20,7 +20,9 @@ namespace pmtana{
   PedAlgoRollingMean::PedAlgoRollingMean(const std::string name)
     : PMTPedestalBase(name)
   //*****************************************************************
-  {}
+  {
+    srand(static_cast<unsigned int>(time(0)));
+  }
 
   //**************************************************************************
   //PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
@@ -31,13 +33,14 @@ namespace pmtana{
   {
 
     _sample_size = pset.get<size_t>("SampleSize");
-
+    
     _max_sigma = pset.get<float>("MaxSigma");
 
     _ped_range_max = pset.get<float>("PedRangeMax");
 
     _ped_range_min = pset.get<float>("PedRangeMin");
-        
+
+    
     srand(static_cast<unsigned int>(time(0)));
  
   }

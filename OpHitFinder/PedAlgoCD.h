@@ -35,8 +35,11 @@ namespace pmtana
     
     ///Alternative ctor
     //PedAlgoCD(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
-    PedAlgoCD(const ::fcllite::PSet &pset,const std::string name="PedCD");
-    
+    //PedAlgoCD(const ::fcllite::PSet &pset,const std::string name="PedCD");
+    PedAlgoCD(const ::fcllite::PSet &pset,
+	      const std::string name,
+	      PMTPedestalBase* BeamGateAlgo);
+
     /// Default destructor
     virtual ~PedAlgoCD();
 
@@ -48,7 +51,9 @@ namespace pmtana
 			  pmtana::PedestalSigma_t&  sigma_v);
     
   private:
-    
+
+    PMTPedestalBase * _beamgatealgo;
+    int _beam_gate_samples;
   };
 }
 #endif

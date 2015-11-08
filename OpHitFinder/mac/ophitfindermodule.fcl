@@ -65,6 +65,12 @@ PedRollingMean:
 
 PedCD :
 {
+   BeamGateSamples : 1500
+
+    SampleSize:      2
+    MaxSigma:        0.5
+    PedRangeMax:     2150
+    PedRangeMin:     100
 
 }
 

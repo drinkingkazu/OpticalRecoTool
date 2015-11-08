@@ -78,7 +78,8 @@ namespace larlite {
     else if(ped_alg_name == "PedRollingMean") 
       _ped_alg = new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedCD") 
-      _ped_alg = new pmtana::PedAlgoCD(ped_pset,ped_alg_name);
+      _ped_alg = new pmtana::PedAlgoCD(ped_pset,ped_alg_name,
+				       new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name));
     
     
     else {
