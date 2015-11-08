@@ -10,8 +10,6 @@
 #include "PedAlgoTruncatedMean.h"
 #include "UtilFunc.h"
 
-#include <ctime>
-
 namespace pmtana{
 
   //*****************************************************************
@@ -82,145 +80,108 @@ namespace pmtana{
       sigma_v[i] = sigma_v[wf.size() - _sample_size -1];
 
     }
-
-
-
-
-
-    // get the most likely sigma value across beamgate
-    unsigned nbins = 20;
-
-
-    std::cout << "a" << std::endl;
-    // const auto mean_mode  = BinnedMaxOccurrence(mean_v ,nbins);
-    // const auto sigma_mode = BinnedMaxOccurrence(sigma_v,nbins);
-
-    // std::cout << mean_mode  << std::endl;
-    // std::cout << sigma_mode << std::endl;
     
-    //srand(static_cast<unsigned int>(time(0)));
-    
-    // hardcode 10
-    // threshold parameter tells me how far mean and sigma have to be away in either direction
-    // locally for me to just do "interpolation" between points
- 
-    // double threshold = 2;
-    // // auto tolerance = double{ threshold * nbins };
+    float  best_sigma = 1.1e9;
+    size_t best_sigma_index = 0;
+    size_t num_good_adc = 0;
+    for(size_t i=0; i<sigma_v.size(); ++i) {
+      // Only consider adcs which mean is in the allowed range
+      auto const& mean  = mean_v[i];
+      if( mean < _ped_range_min || mean > _ped_range_max ) continue;
+
+      auto const& sigma = sigma_v[i];
+      if(sigma<best_sigma) {
+	best_sigma = sigma;
+	best_sigma_index = i;
+      }
+      if(sigma < _max_sigma) num_good_adc += 1;
+    }
 
 
-    // int last_good_index = -1;
+    if( num_good_adc < 1 ) {
+      std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal at all..." << std::endl;
+      return false;
+    }
 
-    // //    for(size_t i = 0; i < wf.size(); ++i) {
-    // size_t i = 0;
-    // int    s = 0;
+    // If not enough # of good mean indices, use the best guess within this waveform
+    if(best_sigma > _max_sigma || num_good_adc<3) {
+      for(size_t i=0; i<mean_v.size(); ++i) {
+	mean_v[i]  = mean_v.at  ( best_sigma_index );
+	sigma_v[i] = sigma_v.at ( best_sigma_index );
+      }
+      //std::cout<<"Only "<<num_good_sigma<<" with min = "<<min_sigma<<std::endl;
+      return true;
+    }
 
-    // unsigned n_samples_before = 5;
-
-    // double constant_factor = threshold/2.0;
-
-    
-    // float  best_sigma = 1.1e9;
-    // size_t best_sigma_index = 0;
-    // size_t num_good_adc = 0;
-
-    // for(size_t i=0; i<sigma_v.size(); ++i) {
-    //   // Only consider adcs which mean is in the allowed range
-    //   auto const& mean  = mean_v[i];
-    //   if( mean < _ped_range_min || mean > _ped_range_max ) continue;
-
-    //   auto const& sigma = sigma_v[i];
-    //   if(sigma<best_sigma) {
-    // 	best_sigma = sigma;
-    // 	best_sigma_index = i;
-    //   }
-    //   if(sigma < _max_sigma) num_good_adc += 1;
-    // }
-
-
-    // if( num_good_adc < 1 ) {
-    //   std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal at all..." << std::endl;
-    //   return false;
-    // }
-
-    // // If not enough # of good mean indices, use the best guess within this waveform
-    // if(best_sigma > _max_sigma || num_good_adc<3) {
-    //   for(size_t i=0; i<mean_v.size(); ++i) {
-    // 	mean_v[i]  = mean_v.at  ( best_sigma_index );
-    // 	sigma_v[i] = sigma_v.at ( best_sigma_index );
-    //   }
-    //   //std::cout<<"Only "<<num_good_sigma<<" with min = "<<min_sigma<<std::endl;
-    //   return true;
-    // }
-
-    // // Else do extrapolation
-    // int last_good_index=-1;
-    // //size_t good_ctr = 0;
-    // for(size_t i=0; i<wf.size(); ++i) {
+    // Else do extrapolation
+    int last_good_index=-1;
+    //size_t good_ctr = 0;
+    for(size_t i=0; i<wf.size(); ++i) {
       
-    //   auto const mean  = mean_v[i];
-    //   auto const sigma = sigma_v[i];
+      auto const mean  = mean_v[i];
+      auto const sigma = sigma_v[i];
 
-    //   if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
+      if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
 
-    // 	if(last_good_index<0) {
-    // 	  last_good_index = (int)i;
-    // 	  continue;
-    // 	}
+	if(last_good_index<0) {
+	  last_good_index = (int)i;
+	  continue;
+	}
 
-    // 	if( (last_good_index+1) < (int)i ) {
+	if( (last_good_index+1) < (int)i ) {
 
-    // 	  float slope = (mean - mean_v.at(last_good_index)) / (float(i - last_good_index));
+	  float slope = (mean - mean_v.at(last_good_index)) / (float(i - last_good_index));
 
-    // 	  for(size_t j=last_good_index+1; j<i; ++j) {
-    // 	    mean_v.at(j) = slope * (float(j-last_good_index)) + mean_v.at(last_good_index);
-    // 	    sigma_v.at(j) = _max_sigma;
-    // 	  }
-    // 	}
-    // 	last_good_index = (int)i;
-    //   }
-    // }
+	  for(size_t j=last_good_index+1; j<i; ++j) {
+	    mean_v.at(j) = slope * (float(j-last_good_index)) + mean_v.at(last_good_index);
+	    sigma_v.at(j) = _max_sigma;
+	  }
+	}
+	last_good_index = (int)i;
+      }
+    }
 
 
-    // // Next do extrapolation to the first and end
-    // if(sigma_v.front() > _max_sigma) {
-    //   int first_index=-1;
-    //   int second_index=-1;
-    //   for(size_t i=0; i<wf.size(); ++i) {
-    // 	if(sigma_v.at(i)<_max_sigma) {
-    // 	  if(first_index<0) first_index = (int)i;
-    // 	  else if(second_index<0) {
-    // 	    second_index = (int)i;
-    // 	    break;
-    // 	  }
-    // 	}
-    //   }
-    //   if(first_index<0 || second_index<0) throw std::exception();
+    // Next do extrapolation to the first and end
+    if(sigma_v.front() > _max_sigma) {
+      int first_index=-1;
+      int second_index=-1;
+      for(size_t i=0; i<wf.size(); ++i) {
+	if(sigma_v.at(i)<_max_sigma) {
+	  if(first_index<0) first_index = (int)i;
+	  else if(second_index<0) {
+	    second_index = (int)i;
+	    break;
+	  }
+	}
+      }
+      if(first_index<0 || second_index<0) throw std::exception();
 
-    //   float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-    //   for(int i=0; i<first_index; ++i) {
-    // 	mean_v.at(i) = mean_v.at(first_index) - slope * (first_index - i);
-    // 	sigma_v.at(i) = _max_sigma;
-    //   }
-    // }
+      float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
+      for(int i=0; i<first_index; ++i) {
+	mean_v.at(i) = mean_v.at(first_index) - slope * (first_index - i);
+	sigma_v.at(i) = _max_sigma;
+      }
+    }
     
-    // if(sigma_v.back() > _max_sigma) {
-    //   int first_index=-1;
-    //   int second_index=-1;
-    //   for(int i=wf.size()-1; i>=0; --i) {
-    // 	if(sigma_v.at(i)<_max_sigma) {
-    // 	  if(second_index<0) second_index = (int)i;
-    // 	  else if(first_index<0) {
-    // 	    first_index = (int)i;
-    // 	    break;
-    // 	  }
-    // 	}
-    //   }
-    //   float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-    //   for(int i=second_index+1; i<int(wf.size()); ++i) {
-    // 	mean_v.at(i) = mean_v.at(second_index) + slope * (i-second_index);
-    // 	sigma_v.at(i) = _max_sigma;
-    //   }
-    // }
+    if(sigma_v.back() > _max_sigma) {
+      int first_index=-1;
+      int second_index=-1;
+      for(int i=wf.size()-1; i>=0; --i) {
+	if(sigma_v.at(i)<_max_sigma) {
+	  if(second_index<0) second_index = (int)i;
+	  else if(first_index<0) {
+	    first_index = (int)i;
+	    break;
+	  }
+	}
+      }
+      float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
+      for(int i=second_index+1; i<int(wf.size()); ++i) {
+	mean_v.at(i) = mean_v.at(second_index) + slope * (i-second_index);
+	sigma_v.at(i) = _max_sigma;
+      }
+    }
     return true;
 
   }
