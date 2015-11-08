@@ -1,28 +1,30 @@
 ////////////////////////////////////////////////////////////////////////
 //
-//  PedAlgoTruncatedMean source
+//  PedAlgoRollingMean source
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_CXX
-#define larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_CXX
+#ifndef larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_CXX
+#define larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_CXX
 
-#include "PedAlgoTruncatedMean.h"
+#include "PedAlgoRollingMean.h"
 #include "UtilFunc.h"
 
 #include <ctime>
 
+#include "TH1D.h"
+
 namespace pmtana{
 
   //*****************************************************************
-  PedAlgoTruncatedMean::PedAlgoTruncatedMean(const std::string name)
+  PedAlgoRollingMean::PedAlgoRollingMean(const std::string name)
     : PMTPedestalBase(name)
   //*****************************************************************
   {}
 
   //**************************************************************************
-  //PedAlgoTruncatedMean::PedAlgoTruncatedMean(const fhicl::ParameterSet &pset,
-  PedAlgoTruncatedMean::PedAlgoTruncatedMean(const ::fcllite::PSet &pset,
+  //PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
+  PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
 					     const std::string name)
     : PMTPedestalBase(name)
   //############################################################
@@ -39,17 +41,16 @@ namespace pmtana{
   }
 
   //*******************************************
-  PedAlgoTruncatedMean::~PedAlgoTruncatedMean()
+  PedAlgoRollingMean::~PedAlgoRollingMean()
   //*******************************************
   {}
 
   //****************************************************************************
-  bool PedAlgoTruncatedMean::ComputePedestal( const pmtana::Waveform_t& wf,
+  bool PedAlgoRollingMean::ComputePedestal( const pmtana::Waveform_t& wf,
 					      pmtana::PedestalMean_t&   mean_v,
 					      pmtana::PedestalSigma_t&  sigma_v)
   //****************************************************************************
   {
-
     // parameters
     if(wf.size()<=(_sample_size * 2))
       return false;
@@ -83,40 +84,51 @@ namespace pmtana{
 
     }
 
+    unsigned nbins = 1000;  
 
+    // //seg faulting...
+    // // const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
+    // // const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
 
-
-
-    // get the most likely sigma value across beamgate
-    unsigned nbins = 20;
-
-
-    std::cout << "a" << std::endl;
-    // const auto mean_mode  = BinnedMaxOccurrence(mean_v ,nbins);
-    // const auto sigma_mode = BinnedMaxOccurrence(sigma_v,nbins);
-
-    // std::cout << mean_mode  << std::endl;
-    // std::cout << sigma_mode << std::endl;
+    auto mode_mean  = get_max(mean_v,nbins);
+    auto mode_sigma = get_max(sigma_v,nbins);
     
-    //srand(static_cast<unsigned int>(time(0)));
+    std::cout << mode_mean  << std::endl;
+    std::cout << mode_sigma << std::endl;
     
-    // hardcode 10
-    // threshold parameter tells me how far mean and sigma have to be away in either direction
-    // locally for me to just do "interpolation" between points
- 
-    // double threshold = 2;
-    // // auto tolerance = double{ threshold * nbins };
+    srand(static_cast<unsigned int>(time(0)));
 
+    double threshold = 4;
+    
+    size_t i = 0;
+    int    s = 0;
 
-    // int last_good_index = -1;
+    unsigned n_samples_before = 5; // might use?
 
-    // //    for(size_t i = 0; i < wf.size(); ++i) {
-    // size_t i = 0;
-    // int    s = 0;
+    while ( i < wf.size() ) {
+      
+      auto const& mean  = mean_v[i]; 
+      auto const& sigma = sigma_v[i];
 
-    // unsigned n_samples_before = 5;
+      // check if current sigma and mean are "good"
+      if(sigma <= threshold * mode_sigma && fabs(mean - mode_mean) <= threshold * mode_sigma) {
 
-    // double constant_factor = threshold/2.0;
+    	while ( s < i ) {
+    	  mean_v [s] = floor(mode_mean) + (double) ( rand() % (unsigned) 5) / 4.0;
+	  //mean_v [s] = floor(mode_mean);
+    	  sigma_v[s] = mode_sigma;
+	  
+    	  s++;
+    	}
+
+    	s = i;
+    	++s;
+      }
+      
+      i++;
+    }
+  
+
 
     
     // float  best_sigma = 1.1e9;
@@ -124,15 +136,17 @@ namespace pmtana{
     // size_t num_good_adc = 0;
 
     // for(size_t i=0; i<sigma_v.size(); ++i) {
+
     //   // Only consider adcs which mean is in the allowed range
     //   auto const& mean  = mean_v[i];
     //   if( mean < _ped_range_min || mean > _ped_range_max ) continue;
 
     //   auto const& sigma = sigma_v[i];
-    //   if(sigma<best_sigma) {
+    //   if(sigma < best_sigma) { //find lowest sigma, this is considered "best" ?
     // 	best_sigma = sigma;
     // 	best_sigma_index = i;
     //   }
+      
     //   if(sigma < _max_sigma) num_good_adc += 1;
     // }
 
@@ -148,10 +162,11 @@ namespace pmtana{
     // 	mean_v[i]  = mean_v.at  ( best_sigma_index );
     // 	sigma_v[i] = sigma_v.at ( best_sigma_index );
     //   }
-    //   //std::cout<<"Only "<<num_good_sigma<<" with min = "<<min_sigma<<std::endl;
+
     //   return true;
     // }
 
+    
     // // Else do extrapolation
     // int last_good_index=-1;
     // //size_t good_ctr = 0;
@@ -176,6 +191,7 @@ namespace pmtana{
     // 	    sigma_v.at(j) = _max_sigma;
     // 	  }
     // 	}
+	
     // 	last_good_index = (int)i;
     //   }
     // }
@@ -224,7 +240,18 @@ namespace pmtana{
     return true;
 
   }
+  const double PedAlgoRollingMean::get_max(const std::vector<double>& v ,int bins) const {
 
+    auto max_it = std::max_element(std::begin(v), std::end(v));
+    auto min_it = std::min_element(std::begin(v), std::end(v));
+
+    TH1D th("th",";;",bins,*min_it,*max_it);
+
+    for (const auto & m : v) th.Fill(m);
+
+    return th.GetXaxis()->GetBinCenter(th.GetMaximumBin());
+    
+  }
 }
 
 #endif

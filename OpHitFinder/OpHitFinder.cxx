@@ -13,6 +13,7 @@
 #include "AlgoFixedWindow.h"
 #include "PedAlgoEdges.h"
 #include "PedAlgoTruncatedMean.h"
+#include "PedAlgoRollingMean.h"
 #include "OpticalRecoException.h"
 
 namespace larlite {
@@ -73,6 +74,11 @@ namespace larlite {
       _ped_alg = new pmtana::PedAlgoEdges(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedTruncatedMean")
       _ped_alg = new pmtana::PedAlgoTruncatedMean(ped_pset,ped_alg_name);
+    else if(ped_alg_name == "PedRollingMean") {
+      _ped_alg = new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name);
+      std::cout << ped_alg_name << std::endl;
+    }
+    
     else {
       std::stringstream ss;
       ss << "Invalid Pedestal algorithm name: " << ped_alg_name;

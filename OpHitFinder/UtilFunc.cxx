@@ -40,11 +40,11 @@ namespace pmtana {
   double BinnedMaxOccurrence(const PedestalMean_t& mean_v,const size_t nbins)
   {
     if(nbins<1) throw OpticalRecoException("Cannot have 0 binning");
-
+    
     auto res = std::minmax_element(std::begin(mean_v),std::end(mean_v));
-
+    
     double bin_width = ((*res.second) - (*res.first)) / ((double)nbins);
-
+    
     if(nbins==1) return ((*res.first) + bin_width /2.);
 
     // Construct array of nbins

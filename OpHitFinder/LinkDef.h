@@ -26,6 +26,8 @@
 #pragma link C++ class pmtana::PMTPedestalBase+;
 #pragma link C++ class pmtana::PedAlgoEdges+;
 #pragma link C++ class pmtana::PedAlgoTruncatedMean+;
+#pragma link C++ class pmtana::PedAlgoRollingMean+;
+
 #pragma link C++ function pmtana::mean(const std::vector<short>&,size_t,size_t)+;
 #pragma link C++ function pmtana::std(const std::vector<short>&,const double,size_t,size_t)+;
 //ADD_NEW_CLASS ... do not change this line

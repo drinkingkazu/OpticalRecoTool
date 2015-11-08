@@ -55,6 +55,14 @@ PedTruncatedMean:
     PedRangeMin:     100
 }
 
+PedRollingMean:
+{
+    SampleSize:      2
+    MaxSigma:        0.5
+    PedRangeMax:     2150
+    PedRangeMin:     100
+}
+
 OpHitFinder:
 {
   module_type: "OpHitFinder"
@@ -65,7 +73,8 @@ OpHitFinder:
   Verbosity: false
  #  HitAlgoPset: @local::standard_algo_fixedwindow
   HitFinder: SlidingWindow
-  Pedestal:  PedTruncatedMean
+#    Pedestal:  PedTruncatedMean
+      Pedestal:  PedRollingMean
 #  Pedestal:  PedEdges
  #  HitFinder: SlidingWindowTwo
 }
