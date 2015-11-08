@@ -5,7 +5,7 @@
  * 
  * \brief Class definition file of PedAlgoRollingMean
  *
- * @author Kazu - Nevis 2013
+ * @author vic - Nevis 2015
  */
 
 /** \addtogroup PulseReco
