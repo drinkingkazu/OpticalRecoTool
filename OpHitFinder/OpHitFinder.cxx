@@ -250,17 +250,7 @@ namespace larlite {
      }
      
      return crossing;
-     //return x;
   }
-  
-  // template<typename W>
-  // int OpHitFinder::sign(W val) const{
-    
-  //   if (val > 0) return  1;
-  //   if (val < 0) return -1;
-  //   return 0;
-    
-  // }
 
   bool OpHitFinder::finalize() {
 

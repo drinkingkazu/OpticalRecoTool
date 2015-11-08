@@ -30,7 +30,10 @@ namespace pmtana
   public:
     double peak, area, ped_mean, ped_sigma;
     double t_start, t_max, t_end;
-  
+
+    //for vic
+    double t_cdfcross;
+    
     pulse_param(){
       reset_param();
     }
@@ -42,6 +45,7 @@ namespace pmtana
       peak = -1;
       ped_mean = ped_sigma = -1;
       t_start = t_max = t_end = -1;
+      t_cdfcross = -1;
     }
     
   };

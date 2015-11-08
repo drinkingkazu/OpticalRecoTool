@@ -94,6 +94,7 @@ namespace pmtana{
     for(const auto& cross : crossings) {
 
       if( wf.at( cross.first ) > sigma_v.at( cross.first ) * threshold +  mean_v.at( cross.first ) ) {
+
 	
 	//we are inside a true pulse, look backward until we go back to baseline...
 	_pulse.reset_param();
@@ -113,17 +114,17 @@ namespace pmtana{
 	  
 	}
 	_pulse.t_start = i; //taking one extra sample as end of pulse
-    	  
+    	i++;
 	//go forward from start point
 	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
 
-	  _pulse.area += wf.at(i);
+	  _pulse.area += wf.at(i) - mean_v.at(i);
 	  i++;
 
 	  //watch for the edge again
 	  if ( i > wf.size() - 1 ) {
 	    i = wf.size() - 1;
-	    _pulse.area += wf.at(i);
+	    _pulse.area += wf.at(i) - mean_v.at(i);
 	    break;
 	  }
 	  
@@ -134,8 +135,9 @@ namespace pmtana{
 	auto it = std::max_element(std::begin(wf) + _pulse.t_start, std::begin(wf) + _pulse.t_end);
 
 	_pulse.t_max    = it - std::begin(wf);
-	_pulse.peak     = *it;
+	_pulse.peak     = *it - mean_v.at(i);
 	_pulse.ped_mean = 2048; // keep it constant for now until we change struct.
+	_pulse.t_cdfcross = cross.second;
 	
 	_pulse_v.push_back(_pulse);
       }
