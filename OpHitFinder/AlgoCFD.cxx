@@ -90,55 +90,77 @@ namespace pmtana{
     //go to each crossing, see if waveform is above pedestal (high above pedestal
     auto crossings = LinearZeroPointX(cfd);
     auto threshold = 5.0;
+    auto number_presample = 5;
+    double before_mean, after_mean;
+    before_mean = after_mean = 0;
+
+    auto in_peak = [&wf,&sigma_v,&mean_v,&threshold](int i) -> bool
+      { return wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i); };
     
     for(const auto& cross : crossings) {
 
       if( wf.at( cross.first ) > sigma_v.at( cross.first ) * threshold +  mean_v.at( cross.first ) ) {
-
 	
-	//we are inside a true pulse, look backward until we go back to baseline...
 	_pulse.reset_param();
 
 	int i = cross.first;
 
-	//go backward from CDF 
-	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
-
+	//backwards
+	//while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	while (in_peak(i) ){
 	  i--;
-
-	  //watch the edge
-	  if ( i < 0 ) {
-	    i = 0;
-	    break;
-	  }
-	  
+	  if ( i < 0 ) { i = 0; break; }
 	}
-	_pulse.t_start = i; //taking one extra sample as end of pulse
-    	i++;
-	//go forward from start point
-	while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	_pulse.t_start = i;
+	
+	//walk a little further backwards to see if we can get 5 low RMS
+	//while ( wf.at(i) < sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	while ( !in_peak(i) ) {
+	  if (i == ( _pulse.t_start - number_presample ) ) break;
+	  i--;
+	  if ( i < 0 ) { i = 0; break; }
+	}
+	
+	before_mean = std::accumulate(std::begin(mean_v) + i,
+				      std::begin(mean_v) + _pulse.t_start, 0.0) / ((double) (_pulse.t_start - i));
 
-	  _pulse.area += wf.at(i) - mean_v.at(i);
+	i = _pulse.t_start + 1;
+	
+	//forwards
+	//while ( wf.at(i) > sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	while ( in_peak(i) ) {
 	  i++;
-
-	  //watch for the edge again
-	  if ( i > wf.size() - 1 ) {
-	    i = wf.size() - 1;
-	    _pulse.area += wf.at(i) - mean_v.at(i);
-	    break;
-	  }
-	  
+	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
 	}
+		
+	_pulse.t_end = i;
+
+	//walk a little further forwards to see if we can get 5 low RMS
+	//while ( wf.at(i) < sigma_v.at(i) * threshold + mean_v.at(i) ) {
+	while ( !in_peak(i) ) {
+	  if (i == ( _pulse.t_end + number_presample ) ) break;
+	  i++;
+	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
+	}
+
+	after_mean = std::accumulate(std::begin(mean_v) + _pulse.t_end + 1,
+				     std::begin(mean_v) + i + 1, 0.0) / ((double) (i - _pulse.t_end));
 	
-	
-	_pulse.t_end = i; //taking one extra sample as end of pulse again
+
+	//how to decide before or after? set before for now
+	_pulse.ped_mean = before_mean;
+
+	if(wf.size() < 50) _pulse.ped_mean = mean_v.front(); //is COSMIC DISCRIMINATOR
+
 	auto it = std::max_element(std::begin(wf) + _pulse.t_start, std::begin(wf) + _pulse.t_end);
 
-	_pulse.t_max    = it - std::begin(wf);
-	_pulse.peak     = *it - mean_v.at(i);
-	_pulse.ped_mean = 2048; // keep it constant for now until we change struct.
-	_pulse.t_cdfcross = cross.second;
-	
+	_pulse.t_max      =  it - std::begin(wf);
+	_pulse.peak       = *it - _pulse.ped_mean;
+	_pulse.t_cdfcross =  cross.second;
+
+	for(auto k = _pulse.t_start; k <= _pulse.t_end; ++k)
+	  _pulse.area += wf.at(i) - _pulse.ped_mean;
+	  
 	_pulse_v.push_back(_pulse);
       }
       
