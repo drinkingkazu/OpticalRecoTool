@@ -61,6 +61,8 @@ namespace pmtana{
       _beamgatealgo->Evaluate(wf);
       mean_v  = _beamgatealgo->Mean();
       sigma_v = _beamgatealgo->Sigma();
+
+      return true;
     }
     
   }
