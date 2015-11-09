@@ -57,7 +57,7 @@ namespace pmtana{
     }
 
     else {
-      //How can I call rolling mean without copy paste shit here? 
+
       _beamgatealgo->Evaluate(wf);
       mean_v  = _beamgatealgo->Mean();
       sigma_v = _beamgatealgo->Sigma();

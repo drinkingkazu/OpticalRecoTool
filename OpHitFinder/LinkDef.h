@@ -20,7 +20,7 @@
 //#pragma link C++ class pmtana::AlgoPedestal+;
 #pragma link C++ class pmtana::AlgoThreshold+;
 #pragma link C++ class pmtana::AlgoFixedWindow+;
-//#pragma link C++ class pmtana::AlgoSlidingWindowTwo+;
+
 #pragma link C++ class pmtana::AlgoSlidingWindow+;
 #pragma link C++ class pmtana::PulseRecoManager+;
 
@@ -29,7 +29,7 @@
 #pragma link C++ class pmtana::PMTPedestalBase+;
 #pragma link C++ class pmtana::PedAlgoEdges+;
 #pragma link C++ class pmtana::PedAlgoTruncatedMean+;
-#pragma link C++ class pmtana::PedAlgoRollingMean+;
+
 #pragma link C++ class pmtana::PedAlgoCD+;
 #pragma link C++ class pmtana::AlgoCFD+;
 

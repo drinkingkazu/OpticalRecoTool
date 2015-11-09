@@ -53,12 +53,6 @@ namespace pmtana{
   {
 
     Reset();
-  // const std::vector<double> OpHitFinder::CFTrace(const std::vector<short>& wf,
-  // 						 const float F,
-  // 						 const unsigned D,
-  // 						 const double ped) const {
-    
-    auto ped = 0;
 
     std::vector<double> cfd; cfd.reserve(wf.size());
 
@@ -156,7 +150,7 @@ namespace pmtana{
 
 	for(auto k = _pulse.t_start; k <= _pulse.t_end; ++k) {
 	  auto a = wf.at(i) - _pulse.ped_mean;
-	  if ( a > 0 ) _pulse.area += a
+	  if ( a > 0 ) _pulse.area += a;
 	}
 	  
 	_pulse_v.push_back(_pulse);

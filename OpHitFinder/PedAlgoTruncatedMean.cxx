@@ -10,13 +10,17 @@
 #include "PedAlgoTruncatedMean.h"
 #include "UtilFunc.h"
 
+#include <ctime>
+
 namespace pmtana{
 
   //*****************************************************************
   PedAlgoTruncatedMean::PedAlgoTruncatedMean(const std::string name)
     : PMTPedestalBase(name)
   //*****************************************************************
-  {}
+  {
+    srand(static_cast<unsigned int>(time(0)));
+  }
 
   //**************************************************************************
   //PedAlgoTruncatedMean::PedAlgoTruncatedMean(const fhicl::ParameterSet &pset,
@@ -34,6 +38,7 @@ namespace pmtana{
 
     _ped_range_min = pset.get<float>("PedRangeMin");
 
+    srand(static_cast<unsigned int>(time(0)));
   }
 
   //*******************************************
@@ -69,14 +74,14 @@ namespace pmtana{
     // front mean
     for(size_t i=0; i<_sample_size; ++i) {
 
-      mean_v[i]  = mean_v[_sample_size];
+      mean_v[i]  = mean_v [_sample_size];
       sigma_v[i] = sigma_v[_sample_size];
       
     }
     // tail mean
     for(size_t i=(wf.size() - _sample_size); i<wf.size(); ++i) {
 
-      mean_v[i]  = mean_v[wf.size() - _sample_size -1];
+      mean_v[i]  = mean_v [wf.size() - _sample_size -1];
       sigma_v[i] = sigma_v[wf.size() - _sample_size -1];
 
     }
@@ -90,7 +95,7 @@ namespace pmtana{
       if( mean < _ped_range_min || mean > _ped_range_max ) continue;
 
       auto const& sigma = sigma_v[i];
-      if(sigma<best_sigma) {
+      if(sigma < best_sigma) {
 	best_sigma = sigma;
 	best_sigma_index = i;
       }
@@ -104,81 +109,120 @@ namespace pmtana{
     }
 
     // If not enough # of good mean indices, use the best guess within this waveform
-    if(best_sigma > _max_sigma || num_good_adc<3) {
+    if(best_sigma > _max_sigma || num_good_adc < 3) {
       for(size_t i=0; i<mean_v.size(); ++i) {
 	mean_v[i]  = mean_v.at  ( best_sigma_index );
 	sigma_v[i] = sigma_v.at ( best_sigma_index );
       }
-      //std::cout<<"Only "<<num_good_sigma<<" with min = "<<min_sigma<<std::endl;
+
       return true;
     }
 
-    // Else do extrapolation
+    
+    // Else do extrapolation, or random seed depending on what we find...
+
+    unsigned nbins = 1000;  
+
+    //////////////////seg faulting...
+    // const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
+    // const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
+
+
+    auto mode_mean  = BinnedMaxTH1D(mean_v ,nbins);
+    auto mode_sigma = BinnedMaxTH1D(sigma_v,nbins);
+    
+
+    unsigned range   = 5;
+    double divisions = 4.0; // for random sampling
+    double threshold = 4;
+
+    double diff_threshold = 2 * mode_sigma;
+    double diff_adc_count = 1;
+    double diff_cutoff = diff_threshold < diff_adc_count ? diff_adc_count : diff_threshold;
+
     int last_good_index=-1;
-    //size_t good_ctr = 0;
-    for(size_t i=0; i<wf.size(); ++i) {
+
+    for(size_t i=0; i < wf.size(); ++i) {
       
       auto const mean  = mean_v[i];
       auto const sigma = sigma_v[i];
 
-      if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
+      // if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
+      // not sure if this works well for basline that is "linear" seen by David K
+      if(sigma <= threshold * mode_sigma && fabs(mean - mode_mean) <= threshold * mode_sigma) {
 
 	if(last_good_index<0) {
 	  last_good_index = (int)i;
 	  continue;
 	}
 
-	if( (last_good_index+1) < (int)i ) {
+	if( ( last_good_index + 1 ) < (int) i ) {
 
-	  float slope = (mean - mean_v.at(last_good_index)) / (float(i - last_good_index));
+	  auto diff = fabs(mean_v.at(last_good_index) - mean);
 
-	  for(size_t j=last_good_index+1; j<i; ++j) {
-	    mean_v.at(j) = slope * (float(j-last_good_index)) + mean_v.at(last_good_index);
-	    sigma_v.at(j) = _max_sigma;
+	  if ( diff >  diff_cutoff) {
+	    //this should become generic interpolation function, for now lets leave.
+	    float slope = (mean - mean_v.at(last_good_index)) / (float(i - last_good_index));
+	    
+	    for(size_t j = last_good_index + 1; j < i; ++j) {
+	      mean_v.at(j)  = slope * ( float(j - last_good_index) ) + mean_v.at(last_good_index);
+	      sigma_v.at(j) = mode_sigma;
+	    }
+	  }
+	  else { //difference roughly the same lets fill random
+	    for(size_t j = last_good_index + 1; j < i; ++j) {
+	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + (double) ( rand() % range) / divisions;
+	      sigma_v.at(j) = mode_sigma;
+	    }
 	  }
 	}
 	last_good_index = (int)i;
       }
     }
+    
 
+    // Next do extrapolation to the first and end (if needed)
+    // vic: for now we leave this i'm not sure if this really needs
+    //      to be tuned until I can make unit test
+    if(sigma_v.front() > mode_sigma) {
+      int first_index  = -1;
+      int second_index = -1;
 
-    // Next do extrapolation to the first and end
-    if(sigma_v.front() > _max_sigma) {
-      int first_index=-1;
-      int second_index=-1;
-      for(size_t i=0; i<wf.size(); ++i) {
-	if(sigma_v.at(i)<_max_sigma) {
-	  if(first_index<0) first_index = (int)i;
-	  else if(second_index<0) {
+      for(size_t i=0; i < wf.size(); ++i) {
+	if( sigma_v.at(i) < mode_sigma ) {
+	  if( first_index < 0 ) first_index = (int)i;
+	  else if( second_index < 0 ) {
 	    second_index = (int)i;
 	    break;
 	  }
 	}
       }
-      if(first_index<0 || second_index<0) throw std::exception();
-
+      
+      if(first_index < 0 || second_index < 0) throw std::exception();
+      
       float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-      for(int i=0; i<first_index; ++i) {
-	mean_v.at(i) = mean_v.at(first_index) - slope * (first_index - i);
+      for(int i=0; i < first_index; ++i) {
+	mean_v.at(i)  = mean_v.at(first_index) - slope * (first_index - i);
 	sigma_v.at(i) = _max_sigma;
       }
     }
     
-    if(sigma_v.back() > _max_sigma) {
-      int first_index=-1;
-      int second_index=-1;
-      for(int i=wf.size()-1; i>=0; --i) {
-	if(sigma_v.at(i)<_max_sigma) {
-	  if(second_index<0) second_index = (int)i;
-	  else if(first_index<0) {
+    if(sigma_v.back() > mode_sigma) {
+      int first_index  = -1;
+      int second_index = -1;
+      for(int i = wf.size()-1; i >= 0; --i) {
+	if(sigma_v.at(i) < mode_sigma) {
+	  if( second_index < 0 ) second_index = (int)i;
+	  else if( first_index < 0 ) {
 	    first_index = (int)i;
 	    break;
 	  }
 	}
       }
+      
       float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-      for(int i=second_index+1; i<int(wf.size()); ++i) {
-	mean_v.at(i) = mean_v.at(second_index) + slope * (i-second_index);
+      for(int i = second_index+1; i < int(wf.size()); ++i) {
+	mean_v.at(i)  = mean_v.at(second_index) + slope * (i-second_index);
 	sigma_v.at(i) = _max_sigma;
       }
     }
