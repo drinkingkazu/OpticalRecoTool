@@ -40,7 +40,8 @@ namespace pmtana{
     _threshold      = pset.get<double>("Threshold");
     _diff_threshold = pset.get<double>("DiffBetweenGapsThreshold");
     _diff_adc_count = pset.get<double>("DiffADCCounts");
-    
+
+    _random_shift   = pset.get<double>("RandomRangeShift");
     // Random seed number generator
     srand(static_cast<unsigned int>(time(0)));
   }
@@ -172,7 +173,7 @@ namespace pmtana{
 	  }
 	  else { //difference roughly the same lets fill random
 	    for(size_t j = last_good_index + 1; j < i; ++j) {
-	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + (double) ( rand() % _range) / _divisions;
+	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	      sigma_v.at(j) = mode_sigma;
 	    }
 	  }
@@ -218,7 +219,7 @@ namespace pmtana{
 	
       }	else {
 	for(int j=0; j < first_index; ++j) {
-	  mean_v.at(j)  = floor( mean_v.at(second_index) ) + (double) ( rand() % _range) / _divisions;
+	  mean_v.at(j)  = floor( mean_v.at(second_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	  sigma_v.at(j) = mode_sigma;
 	}
       }
@@ -255,7 +256,7 @@ namespace pmtana{
       }
       else {
 	for(int j = second_index+1; j < int(wf.size()); ++j) {
-	  mean_v.at(j)  = floor( mean_v.at(first_index) ) + (double) ( rand() % _range) / _divisions;
+	  mean_v.at(j)  = floor( mean_v.at(first_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	  sigma_v.at(j) = mode_sigma;
 	}
       }

@@ -145,7 +145,9 @@ namespace pmtana{
 	
 
 	//how to decide before or after? set before for now
-
+	if ( wf.size() < 1500 ) //it's cosmic discriminator
+	  before_mean = mean_v.front();
+	
 	if( after_mean <= 0 and before_mean <= 0 ) {
 	  std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
 		    << " both before_mean and after_mean are zero or less?" << std::endl;

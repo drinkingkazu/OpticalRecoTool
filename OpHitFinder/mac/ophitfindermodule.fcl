@@ -82,6 +82,9 @@ PedCD :
     RandomRangeDivisions: 4.0
     Threshold: 4
 
+    # Number of ADC count to shift during random sampling
+    RandomRangeShift: -0.5
+    
     # This parameter get's multiplied by mode_sigma to determine
     # whether or not samples are close enough to be filled with random baseline
     # between gaps

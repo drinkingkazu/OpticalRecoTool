@@ -59,7 +59,8 @@ namespace pmtana
     double _threshold;
     double _diff_threshold;
     double _diff_adc_count; 
-    
+
+    double _random_shift;
 
   };
 }
