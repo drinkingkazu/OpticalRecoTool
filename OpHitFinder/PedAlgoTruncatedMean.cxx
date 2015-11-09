@@ -150,8 +150,9 @@ namespace pmtana{
 
       // if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
       // not sure if this works well for basline that is "linear" seen by David K
-      if(sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma) {
-
+      //if(sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma) {
+      if(sigma <= _threshold * mode_sigma) {
+	
 	if(last_good_index<0) {
 	  last_good_index = (int)i;
 	  continue;
