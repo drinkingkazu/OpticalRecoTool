@@ -48,10 +48,18 @@ namespace pmtana
 			  pmtana::PedestalSigma_t&  sigma_v);
     
   private:
+
     size_t _sample_size;
     float  _max_sigma;
     float  _ped_range_max;
     float  _ped_range_min;
+
+    int     _range;
+    double _divisions;
+    double _threshold;
+    double _diff_threshold;
+    double _diff_adc_count; 
+    
 
   };
 }

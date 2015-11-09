@@ -17,7 +17,7 @@ namespace pmtana{
   //*****************************************************************
   PedAlgoTruncatedMean::PedAlgoTruncatedMean(const std::string name)
     : PMTPedestalBase(name)
-  //*****************************************************************
+      //*****************************************************************
   {
     srand(static_cast<unsigned int>(time(0)));
   }
@@ -27,17 +27,21 @@ namespace pmtana{
   PedAlgoTruncatedMean::PedAlgoTruncatedMean(const ::fcllite::PSet &pset,
 					     const std::string name)
     : PMTPedestalBase(name)
-  //############################################################
+      //############################################################
   {
 
-    _sample_size = pset.get<size_t>("SampleSize");
+    _sample_size    = pset.get<size_t>("SampleSize");
+    _max_sigma      = pset.get<float> ("MaxSigma");
+    _ped_range_max  = pset.get<float> ("PedRangeMax");
+    _ped_range_min  = pset.get<float> ("PedRangeMin");
 
-    _max_sigma = pset.get<float>("MaxSigma");
-
-    _ped_range_max = pset.get<float>("PedRangeMax");
-
-    _ped_range_min = pset.get<float>("PedRangeMin");
-
+    _range          = pset.get<int>   ("RandomRange");
+    _divisions      = pset.get<double>("RandomRangeDivisions");
+    _threshold      = pset.get<double>("Threshold");
+    _diff_threshold = pset.get<double>("DiffBetweenGapsThreshold");
+    _diff_adc_count = pset.get<double>("DiffADCCounts");
+    
+    // Random seed number generator
     srand(static_cast<unsigned int>(time(0)));
   }
 
@@ -89,9 +93,11 @@ namespace pmtana{
     float  best_sigma = 1.1e9;
     size_t best_sigma_index = 0;
     size_t num_good_adc = 0;
+
     for(size_t i=0; i<sigma_v.size(); ++i) {
       // Only consider adcs which mean is in the allowed range
       auto const& mean  = mean_v[i];
+      
       if( mean < _ped_range_min || mean > _ped_range_max ) continue;
 
       auto const& sigma = sigma_v[i];
@@ -99,6 +105,7 @@ namespace pmtana{
 	best_sigma = sigma;
 	best_sigma_index = i;
       }
+
       if(sigma < _max_sigma) num_good_adc += 1;
     }
 
@@ -127,20 +134,14 @@ namespace pmtana{
     // const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
     // const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
 
-
     auto mode_mean  = BinnedMaxTH1D(mean_v ,nbins);
     auto mode_sigma = BinnedMaxTH1D(sigma_v,nbins);
+
+    _diff_threshold *= mode_sigma;
     
+    double diff_cutoff = _diff_threshold < _diff_adc_count ? _diff_adc_count : _diff_threshold;
 
-    unsigned range   = 5;
-    double divisions = 4.0; // for random sampling
-    double threshold = 4;
-
-    double diff_threshold = 2 * mode_sigma;
-    double diff_adc_count = 1;
-    double diff_cutoff = diff_threshold < diff_adc_count ? diff_adc_count : diff_threshold;
-
-    int last_good_index=-1;
+    int last_good_index = -1;
 
     for(size_t i=0; i < wf.size(); ++i) {
       
@@ -149,7 +150,7 @@ namespace pmtana{
 
       // if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
       // not sure if this works well for basline that is "linear" seen by David K
-      if(sigma <= threshold * mode_sigma && fabs(mean - mode_mean) <= threshold * mode_sigma) {
+      if(sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma) {
 
 	if(last_good_index<0) {
 	  last_good_index = (int)i;
@@ -171,7 +172,7 @@ namespace pmtana{
 	  }
 	  else { //difference roughly the same lets fill random
 	    for(size_t j = last_good_index + 1; j < i; ++j) {
-	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + (double) ( rand() % range) / divisions;
+	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + (double) ( rand() % _range) / _divisions;
 	      sigma_v.at(j) = mode_sigma;
 	    }
 	  }

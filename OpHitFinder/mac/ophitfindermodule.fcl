@@ -67,18 +67,38 @@ PedCD :
 {
    BeamGateSamples : 1500
 
+    # You need to include parameters fed to PedTruncatedMean since that
+    # algo is called for beam gate sample as well
+
+    # Sliding mean number of samples
+    
     SampleSize:      2
+
     MaxSigma:        0.5
     PedRangeMax:     2150
     PedRangeMin:     100
+    
+    RandomRange: 5
+    RandomRangeDivisions: 4.0
+    Threshold: 4
+
+    # This parameter get's multiplied by mode_sigma to determine
+    # whether or not samples are close enough to be filled with random baseline
+    # between gaps
+    
+    DiffBetweenGapsThreshold: 2
+    DiffADCCounts: 1
 
 }
 
+# Constant fraction discriminator
 CFD:
 {
+   # CFD fraction	
    Fraction: 0.9
-   Delay: 2
 
+   # CFD number of samples delay
+   Delay: 2
 }
 OpHitFinder:
 {
@@ -91,7 +111,7 @@ OpHitFinder:
 
   # HitAlgoPset: @local::standard_algo_fixedwindow
 
-  #HitFinder: SlidingWindow
+  # HitFinder: SlidingWindow
 
   #  Pedestal:  PedTruncatedMean
   #  Pedestal:  PedRollingMean
