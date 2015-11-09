@@ -165,7 +165,7 @@ namespace pmtana{
 	_pulse.t_cfdcross =  cross.second;
 
 	for(auto k = _pulse.t_start; k <= _pulse.t_end; ++k) {
-	  auto a = wf.at(i) - _pulse.ped_mean;
+	  auto a = wf.at(k) - _pulse.ped_mean;
 	  if ( a > 0 ) _pulse.area += a;
 	}
 	  
