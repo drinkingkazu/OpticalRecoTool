@@ -87,7 +87,7 @@ PedCD :
     # between gaps
     
     DiffBetweenGapsThreshold: 2
-    DiffADCCounts: 1
+    DiffADCCounts: 2
 
 }
 
@@ -99,6 +99,21 @@ CFD:
 
    # CFD number of samples delay
    Delay: 2
+
+   # Number of samples to average before pulse
+   # to use as constant baseline under waveform
+   BaselinePreSample: 5
+
+   # Threshold * mode_sigma used to determine if we inside a peak
+   # for CFD crossing
+   PeakThresh: 7.5
+
+   # Threshold * mode_sigma to determine ending of inside peak @ pulse start
+   StartThresh: 5.0
+
+   # Threshold * mode_sigma to determine pulse ending @ tail
+   EndThresh: 1.5 
+
 }
 OpHitFinder:
 {

@@ -32,7 +32,7 @@ namespace pmtana
     double t_start, t_max, t_end;
 
     //for vic
-    double t_cdfcross;
+    double t_cfdcross;
     
     pulse_param(){
       reset_param();
@@ -45,7 +45,7 @@ namespace pmtana
       peak = -1;
       ped_mean = ped_sigma = -1;
       t_start = t_max = t_end = -1;
-      t_cdfcross = -1;
+      t_cfdcross = -1;
     }
     
   };

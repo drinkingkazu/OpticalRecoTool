@@ -185,7 +185,10 @@ namespace pmtana{
     // Next do extrapolation to the first and end (if needed)
     // vic: for now we leave this i'm not sure if this really needs
     //      to be tuned until I can make unit test
+    // update: yes this needs work...
+
     if(sigma_v.front() > mode_sigma) {
+
       int first_index  = -1;
       int second_index = -1;
 
@@ -200,17 +203,34 @@ namespace pmtana{
       }
       
       if(first_index < 0 || second_index < 0) throw std::exception();
+
+
+      auto diff = fabs(mean_v.at(first_index) - mean_v.at(second_index));
       
-      float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-      for(int i=0; i < first_index; ++i) {
-	mean_v.at(i)  = mean_v.at(first_index) - slope * (first_index - i);
-	sigma_v.at(i) = _max_sigma;
+      if ( diff >  diff_cutoff) {
+	
+	float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
+	
+	for(int j=0; j < first_index; ++j) {
+	  mean_v.at(j)  = mean_v.at(first_index) - slope * (first_index - j);
+	  sigma_v.at(j) = _max_sigma;
+	}
+	
+      }	else {
+	for(int j=0; j < first_index; ++j) {
+	  mean_v.at(j)  = floor( mean_v.at(second_index) ) + (double) ( rand() % _range) / _divisions;
+	  sigma_v.at(j) = mode_sigma;
+	}
       }
+      
     }
     
+    
     if(sigma_v.back() > mode_sigma) {
+
       int first_index  = -1;
       int second_index = -1;
+      
       for(int i = wf.size()-1; i >= 0; --i) {
 	if(sigma_v.at(i) < mode_sigma) {
 	  if( second_index < 0 ) second_index = (int)i;
@@ -220,13 +240,28 @@ namespace pmtana{
 	  }
 	}
       }
+
       
-      float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
-      for(int i = second_index+1; i < int(wf.size()); ++i) {
-	mean_v.at(i)  = mean_v.at(second_index) + slope * (i-second_index);
-	sigma_v.at(i) = _max_sigma;
+      auto diff = fabs(mean_v.at(second_index) - mean_v.at(first_index) );
+      
+      if ( diff >  diff_cutoff) {
+    
+	float slope = (mean_v.at(second_index) - mean_v.at(first_index)) / (float(second_index - first_index));
+	for(int j = second_index+1; j < int(wf.size()); ++j) {
+	  mean_v.at(j)  = mean_v.at(second_index) + slope * (j-second_index);
+	  sigma_v.at(j) = _max_sigma;
+	}
+
+      }
+      else {
+	for(int j = second_index+1; j < int(wf.size()); ++j) {
+	  mean_v.at(j)  = floor( mean_v.at(first_index) ) + (double) ( rand() % _range) / _divisions;
+	  sigma_v.at(j) = mode_sigma;
+	}
       }
     }
+
+    
     return true;
 
   }

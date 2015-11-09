@@ -29,6 +29,13 @@ namespace pmtana{
     _F = pset.get<float>("Fraction");
     _D = pset.get<int>  ("Delay");
 
+    _number_presample = pset.get<int>   ("BaselinePreSample");
+    _peak_thresh      = pset.get<double>("PeakThresh");
+    _start_thresh     = pset.get<double>("StartThresh");
+    _end_thresh       = pset.get<double>("EndThresh");
+
+    
+    
     Reset();
 
   }
@@ -76,11 +83,6 @@ namespace pmtana{
     // go to each crossing, see if waveform is above pedestal (high above pedestal)
 
     auto crossings = LinearZeroPointX(cfd);
-    auto number_presample = 5;
-
-    auto peak_thresh  = 5.0;
-    auto start_thresh = 5.0;
-    auto end_thresh   = 1.5;
     
     double before_mean, after_mean;
     before_mean = after_mean = 0;
@@ -93,33 +95,35 @@ namespace pmtana{
     // loop over CFD crossings
     for(const auto& cross : crossings) {
 
-      //      if( wf.at( cross.first ) > sigma_v.at( cross.first ) * threshold +  mean_v.at( cross.first ) ) {
-      if( in_peak( cross.first, peak_thresh) ) {
+      if( in_peak( cross.first, _peak_thresh) ) {
 	_pulse.reset_param();
 
 	int i = cross.first;
 
 	//backwards
-	while ( in_peak(i, start_thresh) ){
+	while ( in_peak(i, _start_thresh) ){
 	  i--;
 	  if ( i < 0 ) { i = 0; break; }
 	}
 	_pulse.t_start = i;
 	
 	//walk a little further backwards to see if we can get 5 low RMS
-	while ( !in_peak(i,start_thresh) ) {
-	  if (i == ( _pulse.t_start - number_presample ) ) break;
+	while ( !in_peak(i,_start_thresh) ) {
+	  if (i == ( _pulse.t_start - _number_presample ) ) break;
 	  i--;
 	  if ( i < 0 ) { i = 0; break; }
 	}
+
+	auto before_mean = double{0.0};
 	
-	before_mean = std::accumulate(std::begin(mean_v) + i,
-				      std::begin(mean_v) + _pulse.t_start, 0.0) / ((double) (_pulse.t_start - i));
+	if ( _pulse.t_start - i > 0 )
+	  before_mean = std::accumulate(std::begin(mean_v) + i,
+					std::begin(mean_v) + _pulse.t_start, 0.0) / ((double) (_pulse.t_start - i));
 
 	i = _pulse.t_start + 1;
 	
 	//forwards
-	while ( in_peak(i,end_thresh) ) {
+	while ( in_peak(i,_end_thresh) ) {
 	  i++;
 	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
 	}
@@ -127,18 +131,28 @@ namespace pmtana{
 	_pulse.t_end = i;
 
 	//walk a little further forwards to see if we can get 5 low RMS
-	while ( !in_peak(i,end_thresh) ) {
-	  if (i == ( _pulse.t_end + number_presample ) ) break;
+	while ( !in_peak(i,_end_thresh) ) {
+	  if (i == ( _pulse.t_end + _number_presample ) ) break;
 	  i++;
 	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
 	}
 
-	after_mean = std::accumulate(std::begin(mean_v) + _pulse.t_end + 1,
-				     std::begin(mean_v) + i + 1, 0.0) / ((double) (i - _pulse.t_end));
+	auto after_mean = double{0.0};
+	
+	if( i - _pulse.t_end > 0)
+	  after_mean = std::accumulate(std::begin(mean_v) + _pulse.t_end + 1,
+				       std::begin(mean_v) + i + 1, 0.0) / ((double) (i - _pulse.t_end));
 	
 
 	//how to decide before or after? set before for now
-	_pulse.ped_mean = before_mean;
+
+	if( after_mean <= 0 and before_mean <= 0 ) {
+	  std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+		    << " both before_mean and after_mean are zero or less?" << std::endl;
+	  throw std::exception();
+	}
+	
+	_pulse.ped_mean = before_mean > 0 ? before_mean : after_mean;
 
 	if(wf.size() < 50) _pulse.ped_mean = mean_v.front(); //is COSMIC DISCRIMINATOR
 
@@ -146,7 +160,7 @@ namespace pmtana{
 
 	_pulse.t_max      =  it - std::begin(wf);
 	_pulse.peak       = *it - _pulse.ped_mean;
-	_pulse.t_cdfcross =  cross.second;
+	_pulse.t_cfdcross =  cross.second;
 
 	for(auto k = _pulse.t_start; k <= _pulse.t_end; ++k) {
 	  auto a = wf.at(i) - _pulse.ped_mean;
@@ -157,6 +171,11 @@ namespace pmtana{
       }
       
     }
+
+    // Vic:
+    // Very close in time pulses have multiple CFD
+    // crossing points. Should we check that pulses now have
+    // some multiplicity?
     
     
     return true;

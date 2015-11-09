@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 #%matplotlib inline
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ from larlite import larlite as fmwk
 rt.gSystem.Load("libLArLite_DataFormat.so")
 
 
-# In[2]:
+# In[ ]:
 
 ### This is the random baseline
 def get_baseline_gaus(baseline,mu=0,sigma=1):
@@ -44,20 +44,37 @@ def get_waveform(amp,sigma,center=None):
     
 
 
-# In[3]:
+# In[ ]:
 
 unit_wf       = rt.larlite.opdetwaveform()
 unit_baseline = rt.std.vector("short")()
 
 for w in xrange(1500):
     unit_wf.push_back(get_baseline_gaus(2048))
-    
-wf1 = get_waveform(100,2,100)
-wf2 = get_waveform(200,2,1000)
+
+#smaller one toward the beginning
+wf1 = get_waveform(100,10,200)
+
+#larger one toward the middle
+wf2 = get_waveform(200,2,800)
+
+#put one on the first tick
+wf3 = get_waveform(150,2,-1)
+
+#put one on the ending pas last tick
+wf4 = get_waveform(150,2,1500)
+
+#how about two overlapping just a hair
+wf5 = get_waveform(200,2,1110)
+wf6 = get_waveform(180,2,1135)
 
 for i in xrange(unit_wf.size()):
     unit_wf[i] += wf1[i]
     unit_wf[i] += wf2[i]
+    unit_wf[i] += wf3[i]
+    unit_wf[i] += wf4[i]
+    unit_wf[i] += wf5[i]
+    unit_wf[i] += wf6[i]
 
 
 # In[ ]:
@@ -69,19 +86,19 @@ for i in xrange(unit_wf.size()):
 #plt.show()
 
 
-# In[4]:
+# In[ ]:
 
 my_module = fmwk.OpHitFinder()                                                                                           
 my_module.Configure("../mac/ophitfindermodule.fcl")                                                                             
 my_module.initialize()
 
 
-# In[5]:
+# In[ ]:
 
 my_module.Reconstruct(unit_wf)
 
 
-# In[6]:
+# In[ ]:
 
 pulses = my_module.Pulses()
 opdigit = unit_wf
@@ -104,8 +121,7 @@ xmax = len(opdigit)
 a = 0
 b = 0
 for p in pulses:
-
-
+    
     span_xmin = p.t_start
     span_xmax = p.t_end
 
@@ -119,6 +135,8 @@ for p in pulses:
                                    color='orange',alpha=0.5,lw=2))
 
     print span_xmin, span_xmax, span_ymin, span_ymax
+    
+    ax.vlines(p.t_cfdcross,2048-5,2048+5,colors='blue')
 
 plt.grid()
 plt.xlabel('Time Tick [15.6 ns]',fontsize=20)
