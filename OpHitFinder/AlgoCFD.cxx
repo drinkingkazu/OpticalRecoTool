@@ -182,9 +182,8 @@ namespace pmtana{
 
     auto pulses_copy = _pulse_v;
     _pulse_v.clear();
-
     
-    std::unordered_map<unsigned,pulse_param> delta_tstart;
+    std::unordered_map<unsigned,pulse_param> delta;
     
     unsigned width = 0;
     for( const auto& p : pulses_copy )  {

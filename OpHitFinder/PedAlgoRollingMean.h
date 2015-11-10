@@ -1,9 +1,9 @@
 /**
- * \file PedAlgoTruncatedMean.h
+ * \file PedAlgoRollingMean.h
  *
  * \ingroup PulseReco
  * 
- * \brief Class definition file of PedAlgoTruncatedMean
+ * \brief Class definition file of PedAlgoRollingMean
  *
  * @author Kazu, Vic - Nevis 2015 
  */
@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_H
-#define larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_H
+#ifndef larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_H
+#define larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_H
 
 // STL
 #include "PMTPedestalBase.h"
@@ -23,22 +23,22 @@ namespace pmtana
 {
 
   /**
-   \class PedAlgoTruncatedMean
+   \class PedAlgoRollingMean
    A class that calculates pedestal mean & standard deviation (here and elsewhere called as "RMS").   
   */
-  class PedAlgoTruncatedMean : public PMTPedestalBase{
+  class PedAlgoRollingMean : public PMTPedestalBase{
 
   public:
 
     /// Default constructor
-    PedAlgoTruncatedMean(const std::string name="PedTruncatedMean");
+    PedAlgoRollingMean(const std::string name="PedRollingMean");
 
     /// Alternative ctor
-    //PedAlgoTruncatedMean(const fhicl::ParameterSet &pset,const std::string name="PedTruncatedMean");
-    PedAlgoTruncatedMean(const ::fcllite::PSet &pset,const std::string name="PedTruncatedMean");
+    //PedAlgoRollingMean(const fhicl::ParameterSet &pset,const std::string name="PedRollingMean");
+    PedAlgoRollingMean(const ::fcllite::PSet &pset,const std::string name="PedRollingMean");
 
     /// Default destructor
-    virtual ~PedAlgoTruncatedMean();
+    virtual ~PedAlgoRollingMean();
     
   protected:
 

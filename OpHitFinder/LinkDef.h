@@ -28,9 +28,9 @@
 
 #pragma link C++ class pmtana::PMTPedestalBase+;
 #pragma link C++ class pmtana::PedAlgoEdges+;
-#pragma link C++ class pmtana::PedAlgoTruncatedMean+;
+#pragma link C++ class pmtana::PedAlgoRollingMean+;
 
-#pragma link C++ class pmtana::PedAlgoCD+;
+#pragma link C++ class pmtana::PedAlgoUB+;
 #pragma link C++ class pmtana::AlgoCFD+;
 
 #pragma link C++ function pmtana::mean(const std::vector<short>&,size_t,size_t)+;

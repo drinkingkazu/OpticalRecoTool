@@ -15,9 +15,9 @@
 #include "AlgoCFD.h"
 
 #include "PedAlgoEdges.h"
-#include "PedAlgoTruncatedMean.h"
+#include "PedAlgoRollingMean.h"
 
-#include "PedAlgoCD.h"
+#include "PedAlgoUB.h"
 #include "OpticalRecoException.h"
 #include "UtilFunc.h"
 
@@ -79,11 +79,11 @@ namespace larlite {
     
     if(ped_alg_name == "PedEdges")
       _ped_alg = new pmtana::PedAlgoEdges(ped_pset,ped_alg_name);
-    else if(ped_alg_name == "PedTruncatedMean")
-      _ped_alg = new pmtana::PedAlgoTruncatedMean(ped_pset,ped_alg_name);
+    else if(ped_alg_name == "PedRollingMean")
+      _ped_alg = new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedCD") // uboone specific 
-      _ped_alg = new pmtana::PedAlgoCD(ped_pset,ped_alg_name,
-				       new pmtana::PedAlgoTruncatedMean(ped_pset,ped_alg_name));
+      _ped_alg = new pmtana::PedAlgoUB(ped_pset,ped_alg_name,
+				       new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name));
     
     
     else {
