@@ -204,11 +204,12 @@ namespace pmtana{
       }
       
       if(first_index < 0 || second_index < 0) {
-	std::cerr << "\n";
-	std::cerr << "first_index:  " << first_index << "\n";
-	std::cerr << "second_index: " << second_index << "\n";
-	std::cerr << "If one of these is less than zero, this means there is pulse\n"
-		  << "on first sample and baseline never went back down, weird!\n";
+	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+		  << "\n"
+		  << "first_index:  " << first_index << "\n"
+		  << "second_index: " << second_index << "\n"
+		  << "If one of these is less than zero, this means there is pulse\n"
+		  << "on first sample and baseline never went back down. Returning false here.";
 	return false;
       }
 
@@ -248,7 +249,17 @@ namespace pmtana{
 	  }
 	}
       }
-
+      
+      if(first_index < 0 || second_index < 0) {
+	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+		  << "\n"
+		  << "first_index:  " << first_index << "\n"
+		  << "second_index: " << second_index << "\n"
+		  << "If one of these is less than zero, this means there is pulse\n"
+		  << "on the last sample and baseline never went back down. Returning false here.";
+	return false;
+      }
+	    
       
       auto diff = fabs(mean_v.at(second_index) - mean_v.at(first_index) );
       
