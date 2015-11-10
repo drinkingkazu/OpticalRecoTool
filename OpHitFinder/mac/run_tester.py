@@ -55,7 +55,9 @@ for entry in xrange(ch.GetEntries()):
         if opch > 32: continue
 
         if not opdigit.size(): continue
-
+        
+        # if opdigit.Waveform().size() < 50: continue
+        
         pmt_id = larutil.Geometry.GetME().OpDetFromOpChannel(opch)
 
         print
@@ -115,7 +117,8 @@ for entry in xrange(ch.GetEntries()):
 
             #if xmin == 0: xmin = span_xmin
             #if xmax == len(opdigit): xmax = span_xmax
-
+            ax.vlines(p.t_cfdcross,p.ped_mean-5,p.ped_mean+5,colors='blue')
+            
         plt.grid()
         plt.xlabel('Time Tick [15.6 ns]',fontsize=20)
         plt.ylabel('ADC',fontsize=20)

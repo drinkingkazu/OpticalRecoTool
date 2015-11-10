@@ -19,3 +19,5 @@
 *.swp
 *.pdf
 /FANN/FANN-2.2.0-Source
+*.ipynb
+*.ipynb_checkpoints*

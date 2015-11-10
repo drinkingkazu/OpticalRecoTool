@@ -8,6 +8,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "TH1D.h"
+
 namespace pmtana {
 
   double mean(const std::vector<short>& wf, size_t start, size_t nsample)
@@ -85,7 +87,18 @@ namespace pmtana {
     return 0;
     
   }
-  
+
+  double BinnedMaxTH1D(const std::vector<double>& v ,int bins){
+    
+    auto max_it = std::max_element(std::begin(v), std::end(v));
+    auto min_it = std::min_element(std::begin(v), std::end(v));
+
+    TH1D th("th",";;",bins,*min_it,*max_it);
+
+    for (const auto & m : v) th.Fill(m);
+
+    return th.GetXaxis()->GetBinCenter(th.GetMaximumBin());
+  }
   
   
 }
