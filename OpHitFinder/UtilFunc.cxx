@@ -50,11 +50,16 @@ namespace pmtana {
     
     if(nbins==1) return ((*res.first) + bin_width /2.);
 
+    //std::cout<<"Min: "<<(*res.first)<<" Max: "<<(*res.second)<<" Width: "<<bin_width<<std::endl;
+
     // Construct array of nbins
-    std::vector<size_t> ctr_v(nbins,0);
+    static std::vector<size_t> ctr_v(nbins,0);
+    for(auto& v : ctr_v) v=0;
     for(auto const& v : mean_v) {
 
-      size_t index = int(v/bin_width);
+      size_t index = int((v - (*res.first))/bin_width);
+      //std::cout<<"adc = "<<v<<" width = "<<bin_width<< " ... "
+      //<<index<<" / "<<ctr_v.size()<<std::endl;
 
       ctr_v[index]++;
 

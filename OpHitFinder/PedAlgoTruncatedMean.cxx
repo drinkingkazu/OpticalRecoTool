@@ -132,11 +132,13 @@ namespace pmtana{
     unsigned nbins = 1000;  
 
     //////////////////seg faulting...
-    // const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
-    // const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
+    const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
+    const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
 
-    auto mode_mean  = BinnedMaxTH1D(mean_v ,nbins);
-    auto mode_sigma = BinnedMaxTH1D(sigma_v,nbins);
+    //auto mode_mean  = BinnedMaxTH1D(mean_v ,nbins);
+    //auto mode_sigma = BinnedMaxTH1D(sigma_v,nbins);
+
+    //std::cout<<mode_mean<<" +/- "<<mode_sigma<<std::endl;
 
     _diff_threshold *= mode_sigma;
     
