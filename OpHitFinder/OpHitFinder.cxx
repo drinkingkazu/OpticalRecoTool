@@ -28,6 +28,7 @@ namespace larlite {
     _name=name;
     _config_file = "";
     _preco_alg = nullptr;
+    _outtree = nullptr;
   }
   
   bool OpHitFinder::initialize() {
@@ -92,7 +93,33 @@ namespace larlite {
     }    
     _preco_mgr.SetDefaultPedAlgo(_ped_alg);
     _preco_mgr.AddRecoAlgo(_preco_alg);
-    
+
+    _outtree = new TTree("out_tree","out_tree");
+
+    //     unsigned _channel;
+    // double _relTime;
+    // double _absTime;
+    // double _frame;
+    // double _width;
+    // double _pulse_area;
+    // double _pulse_peak;
+    // double _PE;
+    // double _zero;
+
+    _outtree->Branch("channel",&_channel,"_channel/I");
+    _outtree->Branch("relTime",&_relTime,"_relTime/D");
+    _outtree->Branch("absTime",&_absTime,"_absTime/D");
+    _outtree->Branch("frame",&_frame,"_frame/I");
+    _outtree->Branch("width",&_width,"_width/D");
+    _outtree->Branch("pulse_area",&_pulse_area,"_pulse_area/D");
+    _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
+    _outtree->Branch("PE",&_PE,"_PE/D");
+    _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
+
+    _outtree->Branch("zero",&_zero,"_zero/D");
+    _outtree->Branch("is_beamgate",&_is_beamgate,"_is_beamgate/I");
+
+
     return true;
   }
   
@@ -114,7 +141,7 @@ namespace larlite {
     auto const trigger_time = trigHandle->TriggerTime();
     auto const beam_time    = trigHandle->BeamGateTime();
 
-    event_ophit* ophits = storage->get_data<event_ophit>(_name);
+    //event_ophit* ophits = storage->get_data<event_ophit>(_name);
     
     //art::ServiceHandle<geo::Geometry> geom;
     //art::ServiceHandle<util::TimeService> ts;
@@ -142,9 +169,9 @@ namespace larlite {
       /// Get the result
       auto const& pulses = _preco_alg->GetPulses();
 
-      if(pulses.empty())
+      // if(pulses.empty())
 	
-	std::cout << "\033[95m[WARNING]\033[00m PulseFinder algorithm returned invalid status! (Ch. " << Channel << ")" << std::endl;
+      // 	std::cout << "\033[95m[WARNING]\033[00m PulseFinder algorithm returned invalid status! (Ch. " << Channel << ")" << std::endl;
 
       for(size_t k=0; k<pulses.size(); ++k){
 
@@ -164,7 +191,24 @@ namespace larlite {
 
 	double width   = ( pulse.t_end - pulse.t_start ) * ts->OpticalClock().TickPeriod();
 
-	ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
+	
+	_channel = Channel;
+	_relTime = RelTime;
+	_absTime = AbsTime;
+	_frame   = Frame;
+	_width   = width;
+	_pulse_area = pulse.area;
+	_pulse_peak = pulse.peak;
+	_PE = PE;
+	_zero = 0.;
+	_is_beamgate = wf_ptr.size() > 1000 ? 1 : 0;
+	  
+
+	_outtree->Fill();
+	//ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
+
+	
+	
       }
     }
     //e.put(std::move(ophits));
@@ -198,7 +242,7 @@ namespace larlite {
   { return _ped_alg->Sigma(); }
   
   bool OpHitFinder::finalize() {
-
+    _outtree->Write();
     return true;
   }
 

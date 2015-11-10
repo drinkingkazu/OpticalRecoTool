@@ -203,7 +203,14 @@ namespace pmtana{
 	}
       }
       
-      if(first_index < 0 || second_index < 0) throw std::exception();
+      if(first_index < 0 || second_index < 0) {
+	std::cerr << "\n";
+	std::cerr << "first_index:  " << first_index << "\n";
+	std::cerr << "second_index: " << second_index << "\n";
+	std::cerr << "If one of these is less than zero, this means there is pulse\n"
+		  << "on first sample and baseline never went back down, weird!\n";
+	return false;
+      }
 
 
       auto diff = fabs(mean_v.at(first_index) - mean_v.at(second_index));

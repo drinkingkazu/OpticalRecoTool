@@ -10,6 +10,7 @@
 #include "AlgoCFD.h"
 #include "UtilFunc.h"
 
+#include <unordered_map>
 namespace pmtana{
 
   //*********************************************************************
@@ -151,7 +152,7 @@ namespace pmtana{
 	if( after_mean <= 0 and before_mean <= 0 ) {
 	  std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
 		    << " both before_mean and after_mean are zero or less?" << std::endl;
-	  throw std::exception();
+	  continue;
 	}
 	
 	_pulse.ped_mean = before_mean > 0 ? before_mean : after_mean;
@@ -178,7 +179,27 @@ namespace pmtana{
     // Very close in time pulses have multiple CFD
     // crossing points. Should we check that pulses now have
     // some multiplicity?
-    
+
+    auto pulses_copy = _pulse_v;
+    _pulse_v.clear();
+
+    std::unordered_map<unsigned,pulse_param> delta;
+    unsigned width = 0;
+    for( const auto& p : pulses_copy )  {
+
+      if ( delta.count(p.t_start) )  {
+	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
+	  delta[p.t_start] = p;
+	else
+	  continue;
+      }
+      else {
+	delta[p.t_start] = p;
+      }
+    }
+
+    for(const auto & p : delta)
+      _pulse_v.push_back(p.second);
     
     return true;
     
