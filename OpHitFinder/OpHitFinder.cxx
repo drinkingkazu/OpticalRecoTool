@@ -170,6 +170,8 @@ namespace larlite {
       }
     }
     //e.put(std::move(ophits));
+
+    storage->set_id(storage->run_id(), storage->subrun_id(), storage->event_id());
     
     return true;
   }
