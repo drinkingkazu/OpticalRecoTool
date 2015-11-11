@@ -1,28 +1,28 @@
 ////////////////////////////////////////////////////////////////////////
 //
-//  PedAlgoCD source
+//  PedAlgoUB source
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef larana_OPTICALDETECTOR_PEDALGOCD_CXX
-#define larana_OPTICALDETECTOR_PEDALGOCD_CXX
+#ifndef larana_OPTICALDETECTOR_PEDALGOUB_CXX
+#define larana_OPTICALDETECTOR_PEDALGOUB_CXX
 
-#include "PedAlgoCD.h"
+#include "PedAlgoUB.h"
 #include "UtilFunc.h"
 #include "OpticalRecoException.h"
 
 namespace pmtana{
 
   //************************************************
-  PedAlgoCD::PedAlgoCD(const std::string name)
+  PedAlgoUB::PedAlgoUB(const std::string name)
     : PMTPedestalBase(name),
       _beamgatealgo(nullptr)
   //************************************************
   {}
   
   //*************************************************************
-  //PedAlgoCD::PedAlgoCD(const fhicl::ParameterSet &pset,
-  PedAlgoCD::PedAlgoCD(const ::fcllite::PSet &pset,
+  //PedAlgoUB::PedAlgoUB(const fhicl::ParameterSet &pset,
+  PedAlgoUB::PedAlgoUB(const ::fcllite::PSet &pset,
 		       const std::string name,
 		       PMTPedestalBase* BeamGateAlgo)
     : PMTPedestalBase(name),
@@ -33,12 +33,12 @@ namespace pmtana{
   }
   
   //***************************
-  PedAlgoCD::~PedAlgoCD()
+  PedAlgoUB::~PedAlgoUB()
   //***************************
   {}
 
   //*********************************************************************
-  bool PedAlgoCD::ComputePedestal( const pmtana::Waveform_t& wf,
+  bool PedAlgoUB::ComputePedestal( const pmtana::Waveform_t& wf,
 				   pmtana::PedestalMean_t&   mean_v,
 				   pmtana::PedestalSigma_t&  sigma_v)
   //*********************************************************************

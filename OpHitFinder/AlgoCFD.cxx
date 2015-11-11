@@ -10,6 +10,7 @@
 #include "AlgoCFD.h"
 #include "UtilFunc.h"
 
+#include <unordered_map>
 namespace pmtana{
 
   //*********************************************************************
@@ -150,8 +151,8 @@ namespace pmtana{
 	
 	if( after_mean <= 0 and before_mean <= 0 ) {
 	  std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
-		    << " both before_mean and after_mean are zero or less?" << std::endl;
-	  throw std::exception();
+		    << " both before_mean and after_mean are zero or less? Ignoring this crossing." << std::endl;
+	  continue;
 	}
 	
 	_pulse.ped_mean = before_mean > 0 ? before_mean : after_mean;
@@ -178,7 +179,57 @@ namespace pmtana{
     // Very close in time pulses have multiple CFD
     // crossing points. Should we check that pulses now have
     // some multiplicity?
+
+    auto pulses_copy = _pulse_v;
+    _pulse_v.clear();
     
+    std::unordered_map<unsigned,pulse_param> delta;
+    
+    unsigned width = 0;
+    for( const auto& p : pulses_copy )  {
+
+      if ( delta.count(p.t_start) )  {
+	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
+	  delta[p.t_start] = p;
+	else
+	  continue;
+      }
+      else {
+	delta[p.t_start] = p;
+      }
+    }
+
+    for(const auto & p : delta)
+      _pulse_v.push_back(p.second);
+    
+
+    //do the same now ensure t_final's are all unique
+    width = 0;
+    
+    pulses_copy.clear();
+    pulses_copy = _pulse_v;
+
+    _pulse_v.clear();
+    delta.clear();
+
+    
+    for( const auto& p : pulses_copy )  {
+
+      if ( delta.count(p.t_end) )  {
+	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
+	  delta[p.t_end] = p;
+	else
+	  continue;
+      }
+      else {
+	delta[p.t_end] = p;
+      }
+    }
+
+    for(const auto & p : delta)
+      _pulse_v.push_back(p.second);
+    
+    //there should be no overlapping pulses now...
     
     return true;
     
@@ -202,7 +253,6 @@ namespace pmtana{
 	continue;
 
       //calculate the crossing X based on linear interpolation bt two pts
-
 
       crossing[i] = (double) i - trace.at(i) * ( 1.0 / ( trace.at(i+1) - trace.at(i) ) );
       

@@ -122,7 +122,8 @@ OpHitFinder:
 {
   module_type: "OpHitFinder"
   OpDetWaveformProducer: pmtreadout
-  TriggerProducer: triggersim
+  #TriggerProducer: triggersim
+  TriggerProducer: daq
   UseArea: true
   SPESize: 118
   Verbosity: false

@@ -20,6 +20,9 @@
 #include "PulseRecoManager.h"
 #include "PMTPulseRecoBase.h"
 
+#include "TTree.h"
+
+
 namespace larlite {
   /**
      \class OpHitFinder
@@ -84,6 +87,19 @@ namespace larlite {
     ::pmtana::PMTPedestalBase*  _ped_alg;
   private:
 
+    TTree* _outtree ;
+
+    unsigned _channel;
+    double _relTime;
+    double _absTime;
+    int _frame;
+    double _width;
+    double _pulse_area;
+    double _pulse_peak;
+    double _PE;
+    double _zero;
+
+    int _is_beamgate;
   };
 }
 #endif

@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////
 //
-//  PedAlgoTruncatedMean source
+//  PedAlgoRollingMean source
 //
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_CXX
-#define larana_OPTICALDETECTOR_PEDALGOTRUNCATEDMEAN_CXX
+#ifndef larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_CXX
+#define larana_OPTICALDETECTOR_PEDALGOROLLINGMEAN_CXX
 
-#include "PedAlgoTruncatedMean.h"
+#include "PedAlgoRollingMean.h"
 #include "UtilFunc.h"
 
 #include <ctime>
@@ -15,7 +15,7 @@
 namespace pmtana{
 
   //*****************************************************************
-  PedAlgoTruncatedMean::PedAlgoTruncatedMean(const std::string name)
+  PedAlgoRollingMean::PedAlgoRollingMean(const std::string name)
     : PMTPedestalBase(name)
       //*****************************************************************
   {
@@ -23,8 +23,8 @@ namespace pmtana{
   }
 
   //**************************************************************************
-  //PedAlgoTruncatedMean::PedAlgoTruncatedMean(const fhicl::ParameterSet &pset,
-  PedAlgoTruncatedMean::PedAlgoTruncatedMean(const ::fcllite::PSet &pset,
+  //PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
+  PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
 					     const std::string name)
     : PMTPedestalBase(name)
       //############################################################
@@ -47,12 +47,12 @@ namespace pmtana{
   }
 
   //*******************************************
-  PedAlgoTruncatedMean::~PedAlgoTruncatedMean()
+  PedAlgoRollingMean::~PedAlgoRollingMean()
   //*******************************************
   {}
 
   //****************************************************************************
-  bool PedAlgoTruncatedMean::ComputePedestal( const pmtana::Waveform_t& wf,
+  bool PedAlgoRollingMean::ComputePedestal( const pmtana::Waveform_t& wf,
 					      pmtana::PedestalMean_t&   mean_v,
 					      pmtana::PedestalSigma_t&  sigma_v)
   //****************************************************************************
@@ -205,7 +205,15 @@ namespace pmtana{
 	}
       }
       
-      if(first_index < 0 || second_index < 0) throw std::exception();
+      if(first_index < 0 || second_index < 0) {
+	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+		  << "\n"
+		  << "first_index:  " << first_index << "\n"
+		  << "second_index: " << second_index << "\n"
+		  << "If one of these is less than zero, this means there is pulse\n"
+		  << "on first sample and baseline never went back down. Returning false here.";
+	return false;
+      }
 
 
       auto diff = fabs(mean_v.at(first_index) - mean_v.at(second_index));
@@ -243,7 +251,17 @@ namespace pmtana{
 	  }
 	}
       }
-
+      
+      if(first_index < 0 || second_index < 0) {
+	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+		  << "\n"
+		  << "first_index:  " << first_index << "\n"
+		  << "second_index: " << second_index << "\n"
+		  << "If one of these is less than zero, this means there is pulse\n"
+		  << "on the last sample and baseline never went back down. Returning false here.";
+	return false;
+      }
+	    
       
       auto diff = fabs(mean_v.at(second_index) - mean_v.at(first_index) );
       

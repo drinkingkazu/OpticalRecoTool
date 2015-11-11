@@ -1,9 +1,9 @@
 /**
- * \file PedAlgoCD.h
+ * \file PedAlgoUB.h
  *
  * \ingroup PulseReco
  * 
- * \brief Class definition file of PedAlgoCD
+ * \brief Class definition file of PedAlgoUB
  *
  * @author Kazu - Nevis 2013
  */
@@ -12,8 +12,8 @@
     
 @{*/
 
-#ifndef larana_OPTICALDETECTOR_PEDALGOCD_H
-#define larana_OPTICALDETECTOR_PEDALGOCD_H
+#ifndef larana_OPTICALDETECTOR_PEDALGOUB_H
+#define larana_OPTICALDETECTOR_PEDALGOUB_H
 
 // STL
 #include "PMTPedestalBase.h"
@@ -23,25 +23,25 @@ namespace pmtana
 {
 
   /**
-   \class PedAlgoCD
+   \class PedAlgoUB
    A class that calculates pedestal mean & standard deviation (here and elsewhere called as "RMS").   
   */
-  class PedAlgoCD : public PMTPedestalBase{
+  class PedAlgoUB : public PMTPedestalBase{
 
   public:
 
     /// Default constructor
-    PedAlgoCD(const std::string name="PedCD");
+    PedAlgoUB(const std::string name="PedCD");
     
     ///Alternative ctor
-    //PedAlgoCD(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
-    //PedAlgoCD(const ::fcllite::PSet &pset,const std::string name="PedCD");
-    PedAlgoCD(const ::fcllite::PSet &pset,
+    //PedAlgoUB(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
+    //PedAlgoUB(const ::fcllite::PSet &pset,const std::string name="PedCD");
+    PedAlgoUB(const ::fcllite::PSet &pset,
 	      const std::string name,
 	      PMTPedestalBase* BeamGateAlgo);
 
     /// Default destructor
-    virtual ~PedAlgoCD();
+    virtual ~PedAlgoUB();
 
   protected:
 
