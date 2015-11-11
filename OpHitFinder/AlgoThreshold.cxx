@@ -69,7 +69,6 @@ namespace pmtana{
 
     for(auto const &value : wf){
     
-      //std::cout << "Threshold=" << threshold << ", value=" << value << ", counter=" << counter << std::endl;
 
       if( !fire && ((double)value) >= threshold ){
 

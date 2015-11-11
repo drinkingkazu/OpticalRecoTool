@@ -23,10 +23,10 @@ my_module.Configure("../ophitfindermodule.fcl")
 my_module.initialize()
 
 
-if(my_module.PulseRecoName() != 'CFD'):
-   raise Exception('\n\n\n\tPulse reco needs to be: CFD. You gave me %s \n\n\n' % my_module.PulseRecoName()) 
+if(my_module.PulseRecoName() != 'Threshold'):
+   raise Exception('\n\n\n\tPulse reco needs to be: Threshold. You gave me %s \n\n\n' % my_module.PulseRecoName()) 
 
-
+cc = 0
 ch = rt.TChain("opdigit_%s_tree" % producer)
 ch.AddFile(in_fname)
 
@@ -48,8 +48,6 @@ ch.GetEntry(entry)
 
 br = None
 exec('br = ch.opdigit_%s_branch' % producer)
-
-cc = 0;
 
 for opdigit_index in xrange(br.size()):
     print '  Reading OpDigit index',opdigit_index
@@ -89,21 +87,6 @@ for opdigit_index in xrange(br.size()):
         upstream = 2043
 
         pmean = np.array(my_module.PedestalMean())
-        cfd = []
-
-        for i in xrange(len(wf)):
-            f = -1.0 * 0.9 * (wf[i] - pmean[i])
-            if i < 2:
-                cfd.append(f)
-            else:
-                cfd.append(f + wf[i-2] - pmean[i])
-        
-        cfd = np.array(cfd)
-        upstream = np.min(wf[p.t_start:p.t_end]) - np.max(cfd[p.t_start:p.t_end])-3
-        cfd += upstream
-
-        plt.plot(np.arange(0,wf.size,1),cfd,lw=2)
-        plt.plot(np.arange(0,wf.size,1),upstream*np.ones(wf.size))
 
         plt.grid()
         plt.xlabel('Time Tick [15.6 ns]',fontsize=20)
@@ -144,19 +127,31 @@ for opdigit_index in xrange(br.size()):
         #lines on top for peak
         peak = ax.hlines(p.peak + p.ped_mean,p.t_start,p.t_end,colors='gray',linestyles='dashed',lw=2,label='Peak: %d' % p.peak)
         
-        # CFD will be here where we make the fake waveform under it
-        #ax.vlines(p.t_cfdcross,p.ped_mean-2,p.ped_mean+2,colors='blue',lw=2)
+        # ax.text (p.t_cfdcross - 15,upstream + 2,"Const. Frac. Disc.")
+        # ax.text (p.t_cfdcross + 1,upstream - 5 ,"Zero pt. crossing\n identifies pulse")
+        # ax.arrow(p.t_cfdcross, upstream, 0, p.ped_mean - upstream, head_width=0.75, head_length=0.5, fc='k', ec='k')
+
+        #this will change depending on theshold, i just take default parameters and mirror what is in algo
+        threshold = np.array(my_module.PedestalSigma())[0] * 5
+        if threshold < 3:
+           threshold = 3
+
+           thresh = plt.plot(np.arange(0,wf.size,1),(threshold + p.ped_mean)*np.ones(wf.size),color='blue',lw=5,alpha=0.5)
+        plt.legend(handles=[start,end,peak,area],loc='best')
+        ax.set_xlim(p.t_start - 15,p.t_end+25)
+        ax.set_ylim(p.ped_mean - 5,p.ped_mean+p.peak + 2)
 
         bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
-        ax.text (p.t_cfdcross - 15,upstream + 2,"Const. Frac. Disc.",bbox=bboxx)
-        ax.text (p.t_cfdcross + 1,upstream - 5 ,"Zero pt. crossing\n identifies pulse",bbox=bboxx)
-        #ax.text (p.t_start-30,p.ped_mean+100 ,"Cosmic Discriminator \nbaseline only take \n@ first tick",bbox=bboxx)
+        ax.text(p.t_start-13,p.ped_mean + 5,"Threshold level\nsignals new pulse",bbox=bboxx)
+        plt.title("Pulse Reco: Threshold")
+
+        ax.set_xlabel('Time Tick [15.6 ns]')
+        ax.set_ylabel('ADC')
         
-        plt.legend(handles=[start,end,peak,area],loc='best')
-        
-        ax.set_xlim(p.t_start - 25,p.t_end+25)
-        ax.set_ylim(np.min(cfd[p.t_start:p.t_end]) - 1,p.peak+1+p.ped_mean)
-        plt.title("Pulse Algo. CFD")
-        #plt.savefig('CFD_%d.eps' % cc, format='eps', dpi=1000)
+        #plt.savefig('Threshold_%d.eps' % cc, format='eps', dpi=1000)
+
         plt.show()
-        cc+=1
+
+        cc += 1
+        
+        

@@ -44,7 +44,7 @@ ch.GetEntry(entry)
 
 br = None
 exec('br = ch.opdigit_%s_branch' % producer)
-
+cc = 0
 for opdigit_index in xrange(br.size()):
     print '  Reading OpDigit index',opdigit_index
 
@@ -99,17 +99,30 @@ for opdigit_index in xrange(br.size()):
         xmin = 0
         xmax = len(opdigit)
         upstream = 2043
-           
+
+        bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
+        ax.text(p.t_start-24,int(p.ped_mean)+6,'Baseline calculated\ntickwise in sliding window.', 
+                bbox=bboxx)
+        ax.text(p.t_max,int(p.ped_mean)+4,'Baseline is continued under peaks.', 
+                bbox=bboxx)
+        
         #plt.legend(handles=[waveform,rollingmean,continuation],loc='best')
         plt.legend()
         ax.set_xlim(p.t_start-25,p.t_end+25)
         ax.xaxis.grid()  
         ax.yaxis.grid() 
-        bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
-        ax.text(p.t_start-24,p.ped_mean+3,'Baseline calculated\ntickwise in sliding window.', 
-                bbox=bboxx)
-        ax.text(p.t_max,p.ped_mean-4,'Baseline is continued under peaks.', 
-                bbox=bboxx)
+
         ax.set_ylim(p.ped_mean - 5,p.ped_mean+p.peak + 2)
+        plt.title("Ped Algo. RollingMean")
+
+
+
+        ax.set_xlabel('Time Tick [15.6 ns]')
+        ax.set_ylabel('ADC')
+
+        #plt.savefig('RollingMean_%d.eps' % cc, format='eps', dpi=1000)
 
         plt.show()
+
+        cc+=1
+

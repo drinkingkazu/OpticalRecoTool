@@ -46,7 +46,7 @@ ch.GetEntry(entry)
 br = None
 exec('br = ch.opdigit_%s_branch' % producer)
 
-
+cc = 0
 for opdigit_index in xrange(br.size()):
     print '  Reading OpDigit index',opdigit_index
 
@@ -106,31 +106,11 @@ for opdigit_index in xrange(br.size()):
     #        bbox=bboxx)
     #ax.set_ylim(p.ped_mean - 5,p.ped_mean+p.peak + 2)
 
+    plt.title("Sliding Mean")
+    ax.set_xlabel('Time Tick [15.6 ns]')
+    ax.set_ylabel('ADC')
+    ax.set_xlim(260,360)
+    #plt.savefig('NoContinuation_%d.eps' % cc, format='eps', dpi=1000)
+
     plt.show()
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
+    cc+=1
