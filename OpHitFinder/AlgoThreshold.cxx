@@ -15,8 +15,8 @@ namespace pmtana{
   AlgoThreshold::AlgoThreshold(const std::string name) : PMTPulseRecoBase(name)
   //***************************************************************************
   {
-    _adc_thres = 3;
-    _nsigma = 5;
+    //_adc_thres = 3;
+    //_nsigma = 5;
     Reset();
   }
 
@@ -28,9 +28,13 @@ namespace pmtana{
   //*******************************************************
   {
 
-    _adc_thres = pset.get<double>("ADCThreshold");
+    _start_adc_thres = pset.get<double>("StartADCThreshold");
+    _end_adc_thres = pset.get<double>("EndADCThreshold");
   
-    _nsigma = pset.get<double>("NSigmaThreshold");
+    //_nsigma = pset.get<double>("NSigmaThreshold");
+    
+    _nsigma_start = pset.get<double>("NSigmaThresholdStart");
+    _nsigma_end   = pset.get<double>("NSigmaThresholdEnd");
 
     Reset();
 
@@ -61,16 +65,20 @@ namespace pmtana{
     double ped_mean = mean_v.front();
     double ped_rms  = sigma_v.front();
 
-    double threshold = ( _adc_thres > (_nsigma * ped_rms) ? _adc_thres : (_nsigma * ped_rms) );
+    //double threshold = ( _adc_thres > (_nsigma * ped_rms) ? _adc_thres : (_nsigma * ped_rms) );
+    auto start_threshold = ( _start_adc_thres > (_nsigma_start * ped_rms) ? _start_adc_thres : (_nsigma_start * ped_rms) );
+    auto end_threshold   = ( _end_adc_thres   > (_nsigma_end   * ped_rms) ? _end_adc_thres   : (_nsigma_end * ped_rms) );
+    
+    //    threshold += ped_mean
 
-    threshold += ped_mean;
+    start_threshold += ped_mean;
+    end_threshold   += ped_mean;
 
     Reset();
 
     for(auto const &value : wf){
-    
-
-      if( !fire && ((double)value) >= threshold ){
+      
+      if( !fire && ((double)value) >= start_threshold ){
 
 	// Found a new pulse
 
@@ -78,18 +86,23 @@ namespace pmtana{
 
 	_pulse.ped_mean  = ped_mean;
 	_pulse.ped_sigma = ped_rms;
-	_pulse.t_start = counter;
 
+	//vic: i move t_start back one, this helps with porch
+
+	_pulse.t_start = counter - 1 > 0 ? counter - 1 : counter;
+	std::cout << "counter: " << counter << " tstart : " << _pulse.t_start << "\n";
+	
       }
-    
-      if( fire && ((double)value) < threshold ){
       
+      if( fire && ((double)value) < end_threshold ){
+	
 	// Found the end of a pulse
-
+	
 	fire = false;
 
-	_pulse.t_end = counter - 1;
-      
+	//vic: i move t_start forward one, this helps with tail
+	_pulse.t_end = counter < wf.size()  ? counter : counter - 1;
+	
 	_pulse_v.push_back(_pulse);
 
 	_pulse.reset_param();
@@ -102,7 +115,7 @@ namespace pmtana{
       if(fire){
 
 	// Add this adc count to the integral
-
+	
 	_pulse.area += ((double)value - (double)ped_mean);
 
 	if(_pulse.peak < ((double)value - (double)ped_mean)) {
@@ -122,10 +135,10 @@ namespace pmtana{
 
     if(fire){
 
-      // Take care of a pulse that did not finish within the readout window.
-    
+      // Take care of a pulse that did not finish within the readout window.    
+
       fire = false;
-    
+   
       _pulse.t_end = counter - 1;
     
       _pulse_v.push_back(_pulse);

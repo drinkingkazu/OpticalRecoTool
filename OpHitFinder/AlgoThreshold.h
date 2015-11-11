@@ -55,11 +55,16 @@ namespace pmtana
 		   const pmtana::PedestalSigma_t& sigma_v);
 
     /// A variable holder for a user-defined absolute ADC threshold value
-    double _adc_thres;
-
-    /// A variable holder for a multiplicative factor for the pedestal standard deviation to define the threshold.
-    double _nsigma;
+    //double _adc_thres;
+    double _start_adc_thres;
+    double _end_adc_thres;
   
+    /// A variable holder for a multiplicative factor for the pedestal standard deviation to define the threshold.
+    //double _nsigma;
+    double _nsigma_start;
+    double _nsigma_end;
+    
+    
   };
 
 }

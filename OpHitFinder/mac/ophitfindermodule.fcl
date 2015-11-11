@@ -2,9 +2,18 @@
 Threshold:
 {
     HitFinder:       "Threshold"
-    ADCThreshold:    3
-    NSigmaThreshold: 5
+    # ADCThreshold:    3
+    # NSigmaThreshold: 5
+
+    StartADCThreshold : 3
+    EndADCThreshold :   2
+  
+    NSigmaThresholdStart : 5
+    NSigmaThresholdEnd : 3
+
+
 }
+
 
 #standard_algo_fixedwindow:
 FixedWindow:
@@ -144,5 +153,5 @@ OpHitFinder:
   #  HitFinder: SlidingWindowTwo
 
   Pedestal: PedUB
-  HitFinder: CFD
+  HitFinder: Threshold
 }

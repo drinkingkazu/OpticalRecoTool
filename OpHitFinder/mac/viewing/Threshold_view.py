@@ -142,7 +142,14 @@ for opdigit_index in xrange(br.size()):
         ax.set_ylim(p.ped_mean - 5,p.ped_mean+p.peak + 2)
 
         bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
-        ax.text(p.t_start-13,p.ped_mean + 5,"Threshold level\nsignals new pulse",bbox=bboxx)
+
+        #
+        #
+        # You can re-enable this text to make words on canvas
+        #
+        #
+        
+        #ax.text(p.t_start-13,p.ped_mean + 5,"Threshold level\nsignals new pulse",bbox=bboxx)
         plt.title("Pulse Reco: Threshold")
 
         ax.set_xlabel('Time Tick [15.6 ns]')
