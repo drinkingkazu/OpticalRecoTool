@@ -5,6 +5,7 @@
 
 #include "DataFormat/ophit.h"
 #include "DataFormat/opflash.h"
+
 namespace larlite {
 
   SimpleFlashFinder::SimpleFlashFinder(const std::string name) : _cfg_mgr("SimpleFlashFinder")
@@ -20,6 +21,8 @@ namespace larlite {
 
     auto const& main_cfg = _cfg_mgr.Config();
 
+    //std::cout << main_cfg.dump() << std::endl;
+    
     // call appropriate produces<>() functions
     auto const p = main_cfg.get_pset(_name);
     _producer = p.get<std::string>("OpFlashProducer");
@@ -35,15 +38,12 @@ namespace larlite {
   bool SimpleFlashFinder::analyze(storage_manager* storage)
   {
 
-    //auto const ophitHandle = storage->get_data<event_ophit>(_producer);
-    auto const ophitHandle = storage->get_data<event_ophit>("OpHitFinder");
+    auto const ophitHandle = storage->get_data<event_ophit>(_producer);
 
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
-    //std::cout << ophitHandle->size() << std::endl;
     
     if(!ophitHandle || ophitHandle->empty()){
-      //std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_producer.c_str()<<std::endl;
-      std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<"OpHitFinder"<<std::endl;
+      std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_producer.c_str()<<std::endl;
       throw std::exception();
     }
 

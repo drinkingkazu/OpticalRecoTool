@@ -21,6 +21,8 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 my_proc.set_output_file("out.root")
 
+my_proc.set_data_to_write(fmwk.data.kOpHit,"OpHitFinder")
+
 # Specify output root file name
 #my_proc.set_ana_output_file("aho1.root");
 
