@@ -23,6 +23,24 @@ namespace pmtana {
     return sum;
   }
 
+
+  double edge_aware_mean(const std::vector<short>& wf, int start, int end) {
+
+    auto m   = double{0.0};
+    auto n_t = unsigned{0};
+	    
+    for(int k = start; k < end; ++k) {
+      if (k < 0 or k > wf.size() - 1) continue;
+      m += wf.at(k);
+      ++n_t;
+    }
+
+    if( n_t > 0 ) m /= n_t;
+    n_t = 0;
+    
+    return m;
+  }
+  
   double std(const std::vector<short>& wf, const double ped_mean, size_t start, size_t nsample)
   {
     if(!nsample) nsample = wf.size();

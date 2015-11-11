@@ -148,8 +148,18 @@ for opdigit_index in xrange(br.size()):
         #ax.vlines(p.t_cfdcross,p.ped_mean-2,p.ped_mean+2,colors='blue',lw=2)
 
         bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
-        ax.text (p.t_cfdcross - 15,upstream + 2,"Const. Frac. Disc.",bbox=bboxx)
-        ax.text (p.t_cfdcross + 1,upstream - 5 ,"Zero pt. crossing\n identifies pulse",bbox=bboxx)
+
+        ##
+        #
+        # Re enable this text to show info
+        #
+        ##
+        
+        #ax.text (p.t_cfdcross - 15,upstream + 2,"Const. Frac. Disc.",bbox=bboxx)
+        #ax.text (p.t_cfdcross + 1,upstream - 5 ,"Zero pt. crossing\n identifies pulse",bbox=bboxx)
+
+
+
         #ax.text (p.t_start-30,p.ped_mean+100 ,"Cosmic Discriminator \nbaseline only take \n@ first tick",bbox=bboxx)
         
         plt.legend(handles=[start,end,peak,area],loc='best')

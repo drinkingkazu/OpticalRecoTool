@@ -101,10 +101,18 @@ for opdigit_index in xrange(br.size()):
         upstream = 2043
 
         bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
-        ax.text(p.t_start-24,int(p.ped_mean)+6,'Baseline calculated\ntickwise in sliding window.', 
-                bbox=bboxx)
-        ax.text(p.t_max,int(p.ped_mean)+4,'Baseline is continued under peaks.', 
-                bbox=bboxx)
+
+        #
+        #
+        # Re-enable this text to draw info on the plot
+        #
+        #
+        
+        
+        # ax.text(p.t_start-24,int(p.ped_mean)+6,'Baseline calculated\ntickwise in sliding window.', 
+        #         bbox=bboxx)
+        # ax.text(p.t_max,int(p.ped_mean)+4,'Baseline is continued under peaks.', 
+        #         bbox=bboxx)
         
         #plt.legend(handles=[waveform,rollingmean,continuation],loc='best')
         plt.legend()

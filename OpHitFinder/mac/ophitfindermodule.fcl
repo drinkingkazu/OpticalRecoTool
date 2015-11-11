@@ -78,12 +78,12 @@ PedUB :
     PedRangeMax:     2150
     PedRangeMin:     100
     
-    RandomRange: 5
-    RandomRangeDivisions: 4.0
+    # RandomRange: 5
+    # RandomRangeDivisions: 4.0
     Threshold: 4
 
     # Number of ADC count to shift during random sampling
-    RandomRangeShift: -0.5
+    # RandomRangeShift: -0.5
     
     # This parameter get's multiplied by mode_sigma to determine
     # whether or not samples are close enough to be filled with random baseline
@@ -92,6 +92,7 @@ PedUB :
     DiffBetweenGapsThreshold: 2
     DiffADCCounts: 2
 
+    NPrePostSamples: 5
 }
 
 # Constant fraction discriminator
@@ -105,7 +106,7 @@ CFD:
 
    # Number of samples to average before pulse
    # to use as constant baseline under waveform
-   BaselinePreSample: 5
+   # BaselinePreSample: 5
 
    # Threshold * mode_sigma used to determine if we inside a peak
    # for CFD crossing
@@ -143,5 +144,5 @@ OpHitFinder:
   #  HitFinder: SlidingWindowTwo
 
   Pedestal: PedUB
-  HitFinder: Threshold
+  HitFinder: CFD
 }

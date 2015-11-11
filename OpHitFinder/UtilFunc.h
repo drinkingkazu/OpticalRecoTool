@@ -6,6 +6,8 @@
 namespace pmtana {
   
   double mean(const std::vector<short>& wf, size_t start=0, size_t nsample=0);
+
+  double edge_aware_mean(const std::vector<short>& wf, int start, int end);
   
   double std(const std::vector<short>& wf, const double ped_mean, size_t start=0, size_t nsample=0);
 

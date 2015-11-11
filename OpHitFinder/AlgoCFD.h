@@ -56,8 +56,8 @@ namespace pmtana
   private:
     float _F;
     int   _D;
-
-    int    _number_presample; 
+    
+    //int    _number_presample; 
     double _peak_thresh;
     double _start_thresh;
     double _end_thresh;    

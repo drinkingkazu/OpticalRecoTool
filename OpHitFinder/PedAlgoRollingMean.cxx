@@ -10,7 +10,7 @@
 #include "PedAlgoRollingMean.h"
 #include "UtilFunc.h"
 
-#include <ctime>
+//#include <ctime>
 
 namespace pmtana{
 
@@ -35,15 +35,17 @@ namespace pmtana{
     _ped_range_max  = pset.get<float> ("PedRangeMax");
     _ped_range_min  = pset.get<float> ("PedRangeMin");
 
-    _range          = pset.get<int>   ("RandomRange");
-    _divisions      = pset.get<double>("RandomRangeDivisions");
+    // _range          = pset.get<int>   ("RandomRange");
+    // _divisions      = pset.get<double>("RandomRangeDivisions");
     _threshold      = pset.get<double>("Threshold");
     _diff_threshold = pset.get<double>("DiffBetweenGapsThreshold");
     _diff_adc_count = pset.get<double>("DiffADCCounts");
 
-    _random_shift   = pset.get<double>("RandomRangeShift");
+    _n_presamples   = pset.get<int>("NPrePostSamples");
+    
+    //_random_shift   = pset.get<double>("RandomRangeShift");
     // Random seed number generator
-    srand(static_cast<unsigned int>(time(0)));
+    //srand(static_cast<unsigned int>(time(0)));
   }
 
   //*******************************************
@@ -153,6 +155,7 @@ namespace pmtana{
 
       // if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
       // not sure if this works well for basline that is "linear" seen by David K
+      
       if(sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma) {
 
 	if(last_good_index<0) {
@@ -173,9 +176,20 @@ namespace pmtana{
 	      sigma_v.at(j) = mode_sigma;
 	    }
 	  }
-	  else { //difference roughly the same lets fill random
+	  else {
+	    //difference roughly the same lets fill with constant baseline
+	    
+	    auto presample_mean  = edge_aware_mean(wf,last_good_index - _n_presamples, last_good_index);
+	    auto postsample_mean = edge_aware_mean(wf,i, _n_presamples);
+	    
+	    auto diff_pre  = fabs(presample_mean  - mode_mean);
+	    auto diff_post = fabs(postsample_mean - mode_mean);
+
+	    auto constant_mean = diff_pre <= diff_post ? presample_mean : postsample_mean;
+	    
 	    for(size_t j = last_good_index + 1; j < i; ++j) {
-	      mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	      //mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	      mean_v.at(j)  = constant_mean;
 	      sigma_v.at(j) = mode_sigma;
 	    }
 	  }
@@ -228,8 +242,12 @@ namespace pmtana{
 	}
 	
       }	else {
+
+	auto postsample_mean = edge_aware_mean(wf,first_index, first_index + _n_presamples);
+
 	for(int j=0; j < first_index; ++j) {
-	  mean_v.at(j)  = floor( mean_v.at(second_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	  //mean_v.at(j)  = floor( mean_v.at(second_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	  mean_v.at(j)  = postsample_mean;
 	  sigma_v.at(j) = mode_sigma;
 	}
       }
@@ -275,8 +293,12 @@ namespace pmtana{
 
       }
       else {
+	
+	auto presample_mean  = edge_aware_mean(wf,first_index - _n_presamples, second_index);
+	
 	for(int j = second_index+1; j < int(wf.size()); ++j) {
-	  mean_v.at(j)  = floor( mean_v.at(first_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	  //mean_v.at(j)  = floor( mean_v.at(first_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
+	  mean_v.at(j)  = presample_mean;
 	  sigma_v.at(j) = mode_sigma;
 	}
       }

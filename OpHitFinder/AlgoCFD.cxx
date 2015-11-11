@@ -30,7 +30,7 @@ namespace pmtana{
     _F = pset.get<float>("Fraction");
     _D = pset.get<int>  ("Delay");
 
-    _number_presample = pset.get<int>   ("BaselinePreSample");
+    //_number_presample = pset.get<int>   ("BaselinePreSample");
     _peak_thresh      = pset.get<double>("PeakThresh");
     _start_thresh     = pset.get<double>("StartThresh");
     _end_thresh       = pset.get<double>("EndThresh");
@@ -109,17 +109,17 @@ namespace pmtana{
 	_pulse.t_start = i;
 	
 	//walk a little further backwards to see if we can get 5 low RMS
-	while ( !in_peak(i,_start_thresh) ) {
-	  if (i == ( _pulse.t_start - _number_presample ) ) break;
-	  i--;
-	  if ( i < 0 ) { i = 0; break; }
-	}
+	// while ( !in_peak(i,_start_thresh) ) {
+	//   if (i == ( _pulse.t_start - _number_presample ) ) break;
+	//   i--;
+	//   if ( i < 0 ) { i = 0; break; }
+	// }
 
-	auto before_mean = double{0.0};
+	// auto before_mean = double{0.0};
 	
-	if ( _pulse.t_start - i > 0 )
-	  before_mean = std::accumulate(std::begin(mean_v) + i,
-					std::begin(mean_v) + _pulse.t_start, 0.0) / ((double) (_pulse.t_start - i));
+	// if ( _pulse.t_start - i > 0 )
+	//   before_mean = std::accumulate(std::begin(mean_v) + i,
+	// 				std::begin(mean_v) + _pulse.t_start, 0.0) / ((double) (_pulse.t_start - i));
 
 	i = _pulse.t_start + 1;
 	
@@ -131,31 +131,37 @@ namespace pmtana{
 		
 	_pulse.t_end = i;
 
-	//walk a little further forwards to see if we can get 5 low RMS
-	while ( !in_peak(i,_end_thresh) ) {
-	  if (i == ( _pulse.t_end + _number_presample ) ) break;
-	  i++;
-	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
-	}
+	// //walk a little further forwards to see if we can get 5 low RMS
+	// while ( !in_peak(i,_end_thresh) ) {
+	//   if (i == ( _pulse.t_end + _number_presample ) ) break;
+	//   i++;
+	//   if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
+	// }
 
-	auto after_mean = double{0.0};
+	// auto after_mean = double{0.0};
 	
-	if( i - _pulse.t_end > 0)
-	  after_mean = std::accumulate(std::begin(mean_v) + _pulse.t_end + 1,
-				       std::begin(mean_v) + i + 1, 0.0) / ((double) (i - _pulse.t_end));
+	// if( i - _pulse.t_end > 0)
+	//   after_mean = std::accumulate(std::begin(mean_v) + _pulse.t_end + 1,
+	// 			       std::begin(mean_v) + i + 1, 0.0) / ((double) (i - _pulse.t_end));
 	
 
 	//how to decide before or after? set before for now
 	if ( wf.size() < 1500 ) //it's cosmic discriminator
 	  before_mean = mean_v.front();
 	
-	if( after_mean <= 0 and before_mean <= 0 ) {
-	  std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
-		    << " both before_mean and after_mean are zero or less? Ignoring this crossing." << std::endl;
-	  continue;
-	}
+	// if( after_mean <= 0 and before_mean <= 0 ) {
+	//   std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+	// 	    << " both before_mean and after_mean are zero or less? Ignoring this crossing." << std::endl;
+	//   continue;
+	// }
+
+	//x
+
+	auto start_ped = mean_v.at(_pulse.t_start);
+	auto end_ped   = mean_v.at(_pulse.t_end);
 	
-	_pulse.ped_mean = before_mean > 0 ? before_mean : after_mean;
+	//just take the "smaller one"
+	_pulse.ped_mean = start_ped <= end_ped ? start_ped : end_ped;;
 
 	if(wf.size() < 50) _pulse.ped_mean = mean_v.front(); //is COSMIC DISCRIMINATOR
 
