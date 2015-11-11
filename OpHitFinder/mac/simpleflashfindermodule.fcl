@@ -1,0 +1,6 @@
+SimpleFlashFinder:
+{
+  module_type: "SimpleFlashFinder"
+  OpFlashProducer: OpHitFinder
+  Verbosity: false
+}
