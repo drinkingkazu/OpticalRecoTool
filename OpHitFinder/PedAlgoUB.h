@@ -5,7 +5,7 @@
  * 
  * \brief Class definition file of PedAlgoUB
  *
- * @author Kazu - Nevis 2013
+ * @author Kazu, Vic - Nevis 2013
  */
 
 /** \addtogroup PulseReco

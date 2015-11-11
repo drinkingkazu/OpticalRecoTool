@@ -64,13 +64,9 @@ namespace larlite {
 
     const ::pmtana::PedestalSigma_t PedestalSigma() const;
 
-    const std::vector<double> CFTrace(const std::vector<short>& wf,
-				      const float    F,
-				      const unsigned D,
-				      const double ped) const;
-
-    //const double LinearZeroPointX(const std::vector<double>& trace) const;
-    const std::map<unsigned,double> LinearZeroPointXX(const std::vector<double>& trace);
+    const std::string PedAlgoName() const   { return _ped_alg->Name(); }
+    const std::string PulseRecoName() const { return _preco_alg->Name(); }
+    
   protected:
     
     // config file

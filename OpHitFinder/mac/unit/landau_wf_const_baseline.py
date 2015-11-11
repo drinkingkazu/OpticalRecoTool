@@ -1,9 +1,5 @@
+#vic - vgenty@nevis.columbia.edu
 
-# coding: utf-8
-
-# In[ ]:
-
-#%matplotlib inline
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import matplotlib.colors as mpc
@@ -89,7 +85,7 @@ for i in xrange(unit_wf.size()):
 # In[ ]:
 
 my_module = fmwk.OpHitFinder()                                                                                           
-my_module.Configure("../mac/ophitfindermodule.fcl")                                                                             
+my_module.Configure("../ophitfindermodule.fcl")                                                                             
 my_module.initialize()
 
 
@@ -136,7 +132,7 @@ for p in pulses:
 
     print span_xmin, span_xmax, span_ymin, span_ymax
     
-    ax.vlines(p.t_cfdcross,2048-5,2048+5,colors='blue')
+    #ax.vlines(p.t_cfdcross,2048-5,2048+5,colors='blue')
 
 plt.grid()
 plt.xlabel('Time Tick [15.6 ns]',fontsize=20)

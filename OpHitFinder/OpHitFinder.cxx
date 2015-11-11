@@ -16,6 +16,7 @@
 
 #include "PedAlgoEdges.h"
 #include "PedAlgoRollingMean.h"
+#include "PedAlgoNoContinuation.h"
 
 #include "PedAlgoUB.h"
 #include "OpticalRecoException.h"
@@ -81,7 +82,9 @@ namespace larlite {
       _ped_alg = new pmtana::PedAlgoEdges(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedRollingMean")
       _ped_alg = new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name);
-    else if(ped_alg_name == "PedCD") // uboone specific 
+    else if(ped_alg_name == "PedNoContinuation")
+      _ped_alg = new pmtana::PedAlgoNoContinuation(ped_pset,ped_alg_name);
+    else if(ped_alg_name == "PedUB") // uboone specific 
       _ped_alg = new pmtana::PedAlgoUB(ped_pset,ped_alg_name,
 				       new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name));
     
@@ -95,17 +98,6 @@ namespace larlite {
     _preco_mgr.AddRecoAlgo(_preco_alg);
 
     _outtree = new TTree("out_tree","out_tree");
-
-    //     unsigned _channel;
-    // double _relTime;
-    // double _absTime;
-    // double _frame;
-    // double _width;
-    // double _pulse_area;
-    // double _pulse_peak;
-    // double _PE;
-    // double _zero;
-
     _outtree->Branch("channel",&_channel,"_channel/I");
     _outtree->Branch("relTime",&_relTime,"_relTime/D");
     _outtree->Branch("absTime",&_absTime,"_absTime/D");
@@ -140,8 +132,8 @@ namespace larlite {
 
     auto const trigger_time = trigHandle->TriggerTime();
     auto const beam_time    = trigHandle->BeamGateTime();
-
-    //event_ophit* ophits = storage->get_data<event_ophit>(_name);
+    
+    event_ophit* ophits = storage->get_data<event_ophit>(_name);
     
     //art::ServiceHandle<geo::Geometry> geom;
     //art::ServiceHandle<util::TimeService> ts;
@@ -205,7 +197,7 @@ namespace larlite {
 	  
 
 	_outtree->Fill();
-	//ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
+	ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
 
 	
 	

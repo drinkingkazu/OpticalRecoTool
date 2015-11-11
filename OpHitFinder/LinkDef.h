@@ -29,6 +29,7 @@
 #pragma link C++ class pmtana::PMTPedestalBase+;
 #pragma link C++ class pmtana::PedAlgoEdges+;
 #pragma link C++ class pmtana::PedAlgoRollingMean+;
+#pragma link C++ class pmtana::PedAlgoNoContinuation+;
 
 #pragma link C++ class pmtana::PedAlgoUB+;
 #pragma link C++ class pmtana::AlgoCFD+;

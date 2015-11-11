@@ -63,7 +63,7 @@ PedRollingMean:
     PedRangeMin:     100
 }
 
-PedCD :
+PedUB :
 {
    BeamGateSamples : 1500
 
@@ -118,6 +118,11 @@ CFD:
    EndThresh: 1.5 
 
 }
+
+PedNoContinuation :
+{
+   SampleSize:      2
+}
 OpHitFinder:
 {
   module_type: "OpHitFinder"
@@ -137,6 +142,6 @@ OpHitFinder:
   #  Pedestal:  PedEdges
   #  HitFinder: SlidingWindowTwo
 
-  Pedestal: PedCD
-  HitFinder: CFD
+  Pedestal: PedUB
+  HitFinder: Threshold
 }

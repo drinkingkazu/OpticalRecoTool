@@ -178,7 +178,7 @@ namespace pmtana{
     // Vic:
     // Very close in time pulses have multiple CFD
     // crossing points. Should we check that pulses now have
-    // some multiplicity?
+    // some multiplicity? No lets just delete them.
 
     auto pulses_copy = _pulse_v;
     _pulse_v.clear();

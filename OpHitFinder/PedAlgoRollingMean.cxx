@@ -53,8 +53,8 @@ namespace pmtana{
 
   //****************************************************************************
   bool PedAlgoRollingMean::ComputePedestal( const pmtana::Waveform_t& wf,
-					      pmtana::PedestalMean_t&   mean_v,
-					      pmtana::PedestalSigma_t&  sigma_v)
+					    pmtana::PedestalMean_t&   mean_v,
+					    pmtana::PedestalSigma_t&  sigma_v)
   //****************************************************************************
   {
 
