@@ -20,7 +20,7 @@
 #include "PulseRecoManager.h"
 #include "PMTPulseRecoBase.h"
 
-#include "TTree.h"
+//#include "TTree.h"
 
 
 namespace larlite {
@@ -83,7 +83,7 @@ namespace larlite {
     ::pmtana::PMTPedestalBase*  _ped_alg;
   private:
 
-    TTree* _outtree ;
+    //TTree* _outtree ;
 
     unsigned _channel;
     double _relTime;

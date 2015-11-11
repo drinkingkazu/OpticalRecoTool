@@ -29,7 +29,7 @@ namespace larlite {
     _name=name;
     _config_file = "";
     _preco_alg = nullptr;
-    _outtree = nullptr;
+    //_outtree = nullptr;
   }
   
   bool OpHitFinder::initialize() {
@@ -97,19 +97,19 @@ namespace larlite {
     _preco_mgr.SetDefaultPedAlgo(_ped_alg);
     _preco_mgr.AddRecoAlgo(_preco_alg);
 
-    _outtree = new TTree("out_tree","out_tree");
-    _outtree->Branch("channel",&_channel,"_channel/I");
-    _outtree->Branch("relTime",&_relTime,"_relTime/D");
-    _outtree->Branch("absTime",&_absTime,"_absTime/D");
-    _outtree->Branch("frame",&_frame,"_frame/I");
-    _outtree->Branch("width",&_width,"_width/D");
-    _outtree->Branch("pulse_area",&_pulse_area,"_pulse_area/D");
-    _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
-    _outtree->Branch("PE",&_PE,"_PE/D");
-    _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
+    // _outtree = new TTree("out_tree","out_tree");
+    // _outtree->Branch("channel",&_channel,"_channel/I");
+    // _outtree->Branch("relTime",&_relTime,"_relTime/D");
+    // _outtree->Branch("absTime",&_absTime,"_absTime/D");
+    // _outtree->Branch("frame",&_frame,"_frame/I");
+    // _outtree->Branch("width",&_width,"_width/D");
+    // _outtree->Branch("pulse_area",&_pulse_area,"_pulse_area/D");
+    // _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
+    // _outtree->Branch("PE",&_PE,"_PE/D");
+    // _outtree->Branch("pulse_peak",&_pulse_peak,"_pulse_peak/D");
 
-    _outtree->Branch("zero",&_zero,"_zero/D");
-    _outtree->Branch("is_beamgate",&_is_beamgate,"_is_beamgate/I");
+    // _outtree->Branch("zero",&_zero,"_zero/D");
+    // _outtree->Branch("is_beamgate",&_is_beamgate,"_is_beamgate/I");
 
 
     return true;
@@ -195,12 +195,9 @@ namespace larlite {
 	_zero = 0.;
 	_is_beamgate = wf_ptr.size() > 1000 ? 1 : 0;
 	  
-
-	_outtree->Fill();
+	
+	//_outtree->Fill();
 	ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
-
-	
-	
       }
     }
     //e.put(std::move(ophits));
@@ -236,7 +233,7 @@ namespace larlite {
   { return _ped_alg->Sigma(); }
   
   bool OpHitFinder::finalize() {
-    _outtree->Write();
+    //_outtree->Write();
     return true;
   }
 
