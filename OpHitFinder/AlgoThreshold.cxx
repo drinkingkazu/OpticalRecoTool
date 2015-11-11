@@ -90,7 +90,7 @@ namespace pmtana{
 	//vic: i move t_start back one, this helps with porch
 
 	_pulse.t_start = counter - 1 > 0 ? counter - 1 : counter;
-	std::cout << "counter: " << counter << " tstart : " << _pulse.t_start << "\n";
+	//std::cout << "counter: " << counter << " tstart : " << _pulse.t_start << "\n";
 	
       }
       

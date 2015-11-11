@@ -18,7 +18,6 @@
 #include "Analysis/ana_base.h"
 #include "FhiclLite/ConfigManager.h"
 
-
 namespace larlite {
   /**
      \class SimpleFlashFinder
@@ -57,11 +56,15 @@ namespace larlite {
     // config file
     ::fcllite::ConfigManager _cfg_mgr;
     std::string _config_file;
-    
-  private:
 
+    double TotalCharge(const std::vector<double>& PEs);
+        
+  private:
+       
     // declare member data here
     std::string _producer;
+
+    //Verbosity
     bool _verbose;
 
     // minimum PE to make a flash

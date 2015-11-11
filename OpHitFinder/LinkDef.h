@@ -25,6 +25,7 @@
 #pragma link C++ class pmtana::PulseRecoManager+;
 
 #pragma link C++ class larlite::OpHitFinder+;
+//#pragma link C++ class larlite::SimpleFlashFinder+;
 
 #pragma link C++ class pmtana::PMTPedestalBase+;
 #pragma link C++ class pmtana::PedAlgoEdges+;

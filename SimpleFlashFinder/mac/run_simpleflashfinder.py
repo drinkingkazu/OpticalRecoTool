@@ -22,10 +22,11 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 my_proc.set_output_file("output_simpleflash.root")
 
 # Specify output root file name
-my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
-
+#my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
+
+
 my_module = fmwk.SimpleFlashFinder()
 my_module.Configure("simpleflashfindermodule.fcl")
 my_proc.add_process(my_module)

@@ -35,11 +35,15 @@ namespace larlite {
   bool SimpleFlashFinder::analyze(storage_manager* storage)
   {
 
-    auto const ophitHandle = storage->get_data<event_ophit>(_producer);
-    std::cout << ophitHandle->size() << std::endl;
+    //auto const ophitHandle = storage->get_data<event_ophit>(_producer);
+    auto const ophitHandle = storage->get_data<event_ophit>("OpHitFinder");
+
+    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
+    //std::cout << ophitHandle->size() << std::endl;
     
     if(!ophitHandle || ophitHandle->empty()){
-      std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_producer.c_str()<<std::endl;
+      //std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_producer.c_str()<<std::endl;
+      std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<"OpHitFinder"<<std::endl;
       throw std::exception();
     }
 
@@ -133,9 +137,6 @@ namespace larlite {
 				 OpTime.at(i).first,
 				 0,
 				 OpCharge.at(i));
-	storage->set_id(storage->run_id(),
-			storage->subrun_id(),
-			storage->event_id());
       }
     return true;
   }

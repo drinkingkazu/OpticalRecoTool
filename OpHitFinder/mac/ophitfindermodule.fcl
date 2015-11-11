@@ -153,5 +153,6 @@ OpHitFinder:
   #  HitFinder: SlidingWindowTwo
 
   Pedestal: PedUB
-  HitFinder: Threshold
+  #  HitFinder: Threshold
+    HitFinder: CFD
 }
