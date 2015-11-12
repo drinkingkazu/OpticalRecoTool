@@ -37,7 +37,7 @@ namespace larlite {
   
   bool SimpleFlashFinder::analyze(storage_manager* storage)
   {
-
+    
     auto const ophitHandle = storage->get_data<event_ophit>(_producer);
 
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
@@ -69,26 +69,26 @@ namespace larlite {
     for(auto const& oh : *ophitHandle)
       {
       // ignore hits with < 5 PE
-      if(oh.PE() < _PE_min_hit) continue;
-
+	if(oh.PE() < _PE_min_hit) continue;
+	
       // allocate this hit to a 100 ns bin
-      double time = oh.PeakTime();
+	double time = oh.PeakTime();
+	
+	int bin = int(time/_bin_width);
 
-      int bin = int(time/_bin_width);
-
-      if( (bin >= n_bins) || (bin < 0) )
-	{
-	  // std::cout << "We should not hav a hit at this time. Something is wrong!" << std::endl;
-	  continue;
+	if( (bin >= n_bins) || (bin < 0) )
+	  {
+	    // std::cout << "We should not hav a hit at this time. Something is wrong!" << std::endl;
+	    continue;
 	}
-
+      
       OpCharge[bin][oh.OpChannel()] += oh.PE();
       nhits +=1;
 
       // if this hit has the largest charge, adjust the flash's time
       if( OpTime[bin].second < oh.PE() )
 	{
-	OpTime[bin] = std::make_pair(oh.PeakTime(), oh.PE() );
+	OpTime[bin] = std::make_pair( oh.PeakTime(), oh.PE() );
 	}
       } // <-- end loop over ophits
 
@@ -98,40 +98,42 @@ namespace larlite {
     // vector of per-PMT PEs collected
     std::vector<double> PEperPMT(32,0.);
 
-    // vecotr of indices to be cleared
+    // vector of indices to be cleared
     std::vector<size_t> to_clear;
 
     for(size_t i=0; i < OpCharge.size()-1; i++)
       {
-      if( ( TotalCharge(OpCharge.at(i+1) ) > TotalCharge(OpCharge.at(i) ) ) and
-	  ( TotalCharge(OpCharge.at(i+1) ) > 0 ) )
-	{
-	  seed = i+1;
-	  for(auto& bin : to_clear)
-	    {
-	      OpCharge[bin] = std::vector<double>(32,0.);
-	      to_clear.clear();
-	    }
-	}
-      // if a bin is lower than the previous one
-      if ( ( TotalCharge(OpCharge.at(i+1) ) < TotalCharge(OpCharge.at(i) ) and
-	     ( TotalCharge(OpCharge.at(i+1) ) > 0) ) )
-	{
-	  // add to each PMT the light from the bin
-	  //determined to be "late-light" bin
-	  for (size_t pmt=0; pmt < 32; pmt++)
-	    {
-	      OpCharge[seed][pmt] += OpCharge.at(i+1)[pmt];
-	    }
-	  to_clear.push_back(i+1);
-	}
+
+	if( ( TotalCharge(OpCharge.at(i+1) ) > TotalCharge(OpCharge.at(i) ) ) and
+	    ( TotalCharge(OpCharge.at(i+1) ) > 0 ) )
+	  {
+	    seed = i+1;
+	    for(auto& bin : to_clear)
+	      {
+		OpCharge[bin] = std::vector<double>(32,0.);
+		to_clear.clear();
+	      }
+	  }
+
+	// the next bin is lower than me
+	if ( ( TotalCharge(OpCharge.at(i+1) ) < TotalCharge(OpCharge.at(i) ) and
+	       ( TotalCharge(OpCharge.at(i+1) ) > 0 ) ) )
+	  {
+	    // add to each PMT the light from the bin
+	    //determined to be "late-light" bin
+	    for (size_t pmt=0; pmt < 32; pmt++)
+	      {
+		OpCharge[seed][pmt] += OpCharge.at(i+1)[pmt];
+	      }
+	    to_clear.push_back(i+1);
+	  }
       }
+
     
     // loop through the 100 ns windows and create flashes
     for (size_t i=0; i < OpCharge.size(); i++)
       {
 	if ( TotalCharge(OpCharge.at(i)) <= _PE_min_flash) continue;
-	
 	opflashes->emplace_back( OpTime.at(i).first,
 				 0.05,
 				 OpTime.at(i).first,

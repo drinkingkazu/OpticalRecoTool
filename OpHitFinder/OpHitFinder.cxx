@@ -183,19 +183,7 @@ namespace larlite {
 
 	double width   = ( pulse.t_end - pulse.t_start ) * ts->OpticalClock().TickPeriod();
 
-	
-	_channel = Channel;
-	_relTime = RelTime;
-	_absTime = AbsTime;
-	_frame   = Frame;
-	_width   = width;
-	_pulse_area = pulse.area;
-	_pulse_peak = pulse.peak;
-	_PE = PE;
-	_zero = 0.;
-	_is_beamgate = wf_ptr.size() > 1000 ? 1 : 0;
-	  
-	
+
 	//_outtree->Fill();
 	ophits->emplace_back( Channel, RelTime, AbsTime, Frame, width, pulse.area, pulse.peak, PE, 0. );
       }

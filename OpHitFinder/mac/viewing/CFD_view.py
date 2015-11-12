@@ -146,7 +146,7 @@ for opdigit_index in xrange(br.size()):
         
         # CFD will be here where we make the fake waveform under it
         #ax.vlines(p.t_cfdcross,p.ped_mean-2,p.ped_mean+2,colors='blue',lw=2)
-
+        ax.vlines(p.t_max,p.ped_mean-2,p.ped_mean+2,colors='blue',lw=2)
         bboxx=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5',alpha=0.9)
 
         ##
@@ -167,6 +167,10 @@ for opdigit_index in xrange(br.size()):
         ax.set_xlim(p.t_start - 25,p.t_end+25)
         ax.set_ylim(np.min(cfd[p.t_start:p.t_end]) - 1,p.peak+1+p.ped_mean)
         plt.title("Pulse Algo. CFD")
+        
+        
+        
+        
         #plt.savefig('CFD_%d.eps' % cc, format='eps', dpi=1000)
         plt.show()
         cc+=1

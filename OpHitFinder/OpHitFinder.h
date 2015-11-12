@@ -85,15 +85,15 @@ namespace larlite {
 
     //TTree* _outtree ;
 
-    unsigned _channel;
-    double _relTime;
-    double _absTime;
-    int _frame;
-    double _width;
-    double _pulse_area;
-    double _pulse_peak;
-    double _PE;
-    double _zero;
+    // unsigned _channel;
+    // double _relTime;
+    // double _absTime;
+    // int _frame;
+    // double _width;
+    // double _pulse_area;
+    // double _pulse_peak;
+    // double _PE;
+    // double _zero;
 
     int _is_beamgate;
   };
