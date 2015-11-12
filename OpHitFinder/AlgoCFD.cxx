@@ -195,13 +195,13 @@ namespace pmtana{
     for( const auto& p : pulses_copy )  {
 
       if ( delta.count(p.t_start) )  {
-	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
-	  delta[p.t_start] = p;
-	else
-	  continue;
+    	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
+    	  delta[p.t_start] = p;
+    	else
+    	  continue;
       }
       else {
-	delta[p.t_start] = p;
+    	delta[p.t_start] = p;
       }
     }
 
@@ -217,18 +217,17 @@ namespace pmtana{
 
     _pulse_v.clear();
     delta.clear();
-
     
     for( const auto& p : pulses_copy )  {
 
       if ( delta.count(p.t_end) )  {
-	if (  (p.t_end - p.t_start) > (delta[p.t_start].t_end - delta[p.t_start].t_start) )
-	  delta[p.t_end] = p;
-	else
-	  continue;
+    	if (  (p.t_end - p.t_start) > (delta[p.t_end].t_end - delta[p.t_end].t_start) )
+    	  delta[p.t_end] = p;
+    	else
+    	  continue;
       }
       else {
-	delta[p.t_end] = p;
+    	delta[p.t_end] = p;
       }
     }
 
