@@ -27,8 +27,7 @@ namespace larlite {
     
     _flash_algo     = p.get<std::string>("FlashFinderAlgo");
     _hit_producer   = p.get<std::string>("OpHitProducer");
-    _flash_producer = p.get<std::string>("OpFlashProducer");
-    
+    _flash_producer = p.get<std::string>("OpFlashProducer");    
     
     auto const flash_pset = main_cfg.get_pset(_flash_algo);
     
@@ -38,7 +37,7 @@ namespace larlite {
       _preco_alg = new pmtana::NotSimpleFlashFinder(flash_pset);
     
     else {
-      std::cerr << "Invalid PulseReco algorithm name: " << _flash_algo << "\n";
+      std::cerr << "Invalid FlassReco algorithm name: " << _flash_algo << "\n";
       throw std::exception();
     }
     
@@ -48,9 +47,9 @@ namespace larlite {
   }
       
   bool FlashFinder::analyze(storage_manager* storage) {
-      
-    auto const ophitHandle = storage->get_data<event_ophit>(_hit_producer);
 
+    auto const ophitHandle = storage->get_data<event_ophit>(_hit_producer);
+    
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
     
     if(!ophitHandle || ophitHandle->empty()){
@@ -59,11 +58,8 @@ namespace larlite {
     }
 
     event_opflash* opflashes = storage->get_data<event_opflash>(_name);
-    
     auto n_flashes = _preco_mgr.CreateFlashes(ophitHandle);
 
-    std::cout << " Saw : " << n_flashes << std::endl;
-    
     for(const auto& flash :  _preco_alg->GetFlashes() ) 
 
       opflashes->push_back(flash);
@@ -80,7 +76,7 @@ namespace larlite {
   
   bool FlashFinder::finalize() {
 
-  
+    
     return true;
   }
 

@@ -110,9 +110,9 @@ my_proc = fmwk.ana_processor()
 my_proc.add_input_file ("temp.root")
 my_proc.set_output_file("temp2.root")
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH) 
-
-my_module = fmwk.FlashFinder()
-my_module.Configure("../flashfindermodule.fcl")
+#my_proc.set_data_to_write(fmwk.data.kOpFlash,'funny')
+my_module = fmwk.SimpleFlashFinder()
+my_module.Configure("../simpleflashfindermodule.fcl")
 my_proc.add_process(my_module)
 my_proc.run()
 
@@ -121,7 +121,8 @@ mgr.set_io_mode(mgr.kREAD)
 mgr.add_in_filename("temp2.root")
 mgr.open()
 mgr.next_event()
-event_opflash = mgr.get_data(fmwk.data.kOpFlash,'FlashFinder')
+event_opflash = mgr.get_data(fmwk.data.kOpFlash,'SimpleFlashFinder')
+
 
 
 plt.rcParams.update({'font.size': 16}) 
@@ -146,3 +147,5 @@ plt.show()
 import os
 os.system('rm -r temp.root')
 os.system('rm -r temp2.root')
+
+

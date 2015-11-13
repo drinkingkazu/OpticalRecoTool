@@ -1,17 +1,23 @@
 FlashFinder:
 {
-    FlashFinderAlgo : SimpleFlash
+#    FlashFinderAlgo : SimpleFlashFinder
+    FlashFinderAlgo : NotSimpleFlashFinder
     OpHitProducer   : OpHitFinder
     OpFlashProducer : OpFlashFinder
   
-    #MinTimeIntegrated: .350 #in microseconds
   
 }
 
 
 
-SimpleFlash:
+SimpleFlashFinder:
 {
 
+
+}
+
+NotSimpleFlashFinder:
+{
+    MinTimeIntegrated: .350 #in microseconds
 
 }

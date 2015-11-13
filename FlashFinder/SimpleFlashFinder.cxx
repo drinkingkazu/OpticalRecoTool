@@ -15,7 +15,7 @@ namespace pmtana{
   SimpleFlashFinder::SimpleFlashFinder(const ::fcllite::PSet &p)
     : FlashFinderBase()
   {
-
+    Reset();
     _PE_min_flash = 10; //50;
     _PE_min_hit = 1;
     _bin_width = 0.1; // usec
@@ -26,7 +26,8 @@ namespace pmtana{
   {}
 
   unsigned SimpleFlashFinder::Flash(const ::larlite::event_ophit* ophits) {
-
+    Reset();
+    
     // only use the beam-gate window to find flashes
     double beam_gate = 23.4; //usec
 

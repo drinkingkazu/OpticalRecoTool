@@ -17,12 +17,11 @@ namespace pmtana{
   {}
 
   FlashFinderManager::~FlashFinderManager() {}
-
   
   void FlashFinderManager::SetFlashAlgo (FlashFinderBase* algo)
   
   {
-    if(!_flash_algo) {
+    if(!algo) {
       std::cerr << "\n\t Not a valid algo\n";
       throw std::exception();
     }
@@ -39,7 +38,6 @@ namespace pmtana{
     auto flashes_produced = _flash_algo->RecoFlash(ophits);
     
     return flashes_produced;
-    
   }
 
 }

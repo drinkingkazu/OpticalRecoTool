@@ -27,6 +27,8 @@ namespace pmtana
 
     unsigned RecoFlash(const ::larlite::event_ophit* ophits);
 
+    virtual void Reset();
+    
   private:
 
   protected:
