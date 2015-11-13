@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # In[ ]:
@@ -18,19 +17,21 @@ import sys
 mgr = larlite.storage_manager()
 mgr.set_io_mode(mgr.kREAD)
 
-infile = sys.arvg[1]
+infile = sys.argv[1]
 #infile = "output_simpleflash.root"
 
-flashproducer = sys.argv[2]
+flashproducer = str(sys.argv[2])
 #flashproducer = "SimpleFlashFinder"
 mgr.add_in_filename(infile)
 
 mgr.open()
 
 b = []
-    
+print mgr    
 while mgr.next_event() :
+
     a = mgr.get_data(larlite.data.kOpFlash,flashproducer)
+
     #z = mgr.get_data(larlite.data.kOpHit,"OpHitFinder")
 
     if a.size() <= 0: # no flash ok fine
@@ -41,6 +42,7 @@ while mgr.next_event() :
     
     for aa in xrange(a.size()):
         b.append(a[aa].TotalPE())
+
 b = np.array(b)
 
 

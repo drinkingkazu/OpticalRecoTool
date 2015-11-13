@@ -47,7 +47,6 @@ namespace pmtana{
 
     //bin the ophits
     for(auto& oh : *ophits) {
-      std::cout << "9 ";
     
       double time = oh.PeakTime();
 	

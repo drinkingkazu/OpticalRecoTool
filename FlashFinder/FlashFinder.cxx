@@ -50,7 +50,6 @@ namespace larlite {
 
     auto const ophitHandle = storage->get_data<event_ophit>(_hit_producer);
     
-    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
     
     if(!ophitHandle || ophitHandle->empty()){
       std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_hit_producer.c_str()<<std::endl;
@@ -60,10 +59,15 @@ namespace larlite {
     event_opflash* opflashes = storage->get_data<event_opflash>(_name);
     auto n_flashes = _preco_mgr.CreateFlashes(ophitHandle);
 
-    for(const auto& flash :  _preco_alg->GetFlashes() ) 
+    //if (n_flashes > 0 ) std::cout << "Found: " << n_flashes << "\n";
 
-      opflashes->push_back(flash);
+    *opflashes = _preco_alg->GetFlashes();
     
+    // for(const auto& flash :  _preco_alg->GetFlashes() ) 
+
+    // opflashes->push_back(flash);
+    
+    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
     
     return true;
   }

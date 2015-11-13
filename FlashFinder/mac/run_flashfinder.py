@@ -21,7 +21,7 @@ my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
 my_proc.set_output_file("flasher_out.root")
 
-my_proc.set_data_to_write(fmwk.data.kOpHit,"OpHitFinder")
+#my_proc.set_data_to_write(fmwk.data.kOpHit,"OpHitFinder")
 
 
 # Attach an analysis unit ... here we use a base class which does nothing.
