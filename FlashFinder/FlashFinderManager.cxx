@@ -1,10 +1,14 @@
-//really bad flash framework
-//by vic
+////////////////////////////////////////////////////////////////////////
+//
+//  FlasFinderManager source
+//
+////////////////////////////////////////////////////////////////////////
 
 #ifndef FLASHFINDERMANAGER_CXX
 #define FLASHFINDERMANAGER_CXX
 
 #include "FlashFinderManager.h"
+#include <sstream>
 
 namespace pmtana{
   

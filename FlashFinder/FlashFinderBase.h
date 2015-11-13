@@ -33,7 +33,7 @@ namespace pmtana
 
     ::larlite::event_opflash _flash_v;
     
-    virtual unsigned Flash(const ::larlite::event_ophit* ophits);
+    virtual unsigned Flash(const ::larlite::event_ophit* ophits) = 0;
     
   };
 

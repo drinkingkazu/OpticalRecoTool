@@ -5,6 +5,11 @@
 
 namespace pmtana{
 
+  FlashFinderBase::FlashFinderBase() {}
+
+  FlashFinderBase::~FlashFinderBase() {}
+  
+  
   unsigned FlashFinderBase::RecoFlash(const ::larlite::event_ophit* ophits) {
     return this->Flash(ophits);
   }

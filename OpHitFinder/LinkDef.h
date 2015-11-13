@@ -22,6 +22,7 @@
 #pragma link C++ class pmtana::AlgoFixedWindow+;
 
 #pragma link C++ class pmtana::AlgoSlidingWindow+;
+
 #pragma link C++ class pmtana::PulseRecoManager+;
 
 #pragma link C++ class larlite::OpHitFinder+;
