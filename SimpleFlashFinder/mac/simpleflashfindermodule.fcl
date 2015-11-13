@@ -3,4 +3,10 @@ SimpleFlashFinder:
   module_type: "SimpleFlashFinder"
   OpFlashProducer: OpHitFinder
   Verbosity: false
+  	     
+  # Fixed integration time. We round UP whichever
+  # bin this falls in from initial flash
+  
+  MinTimeIntegrated: .350 #in microseconds
+  
 }

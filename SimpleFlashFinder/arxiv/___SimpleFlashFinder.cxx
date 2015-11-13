@@ -1,31 +1,54 @@
-//By David C. Ported to larlite by Brooke. ruined by vic in new framework.
-
-#ifndef SIMPLEFLASHFINDER_CXX
-#define SIMPLEFLASHFINDER_CXX
+#ifndef LARLITE_SIMPLEFLASHFINDER_CXX
+#define LARLITE_SIMPLEFLASHFINDER_CXX
 
 #include "SimpleFlashFinder.h"
-#include "FhiclLite/ConfigManager.h"
 
-namespace pmtana{
+#include "DataFormat/ophit.h"
+#include "DataFormat/opflash.h"
 
-  SimpleFlashFinder::SimpleFlashFinder()
-    : FlashFinderBase()
-  {}
+namespace larlite {
+
+  SimpleFlashFinder::SimpleFlashFinder(const std::string name) : _cfg_mgr("SimpleFlashFinder")
+  {
+    _name=name;
+    _config_file = "";
+  }
   
-  SimpleFlashFinder::SimpleFlashFinder(const ::fcllite::PSet &p)
-    : FlashFinderBase()
+  bool SimpleFlashFinder::initialize()
   {
 
+    _cfg_mgr.AddCfgFile(_config_file);
+
+    auto const& main_cfg = _cfg_mgr.Config();
+
+    //std::cout << main_cfg.dump() << std::endl;
+    
+    // call appropriate produces<>() functions
+    auto const p = main_cfg.get_pset(_name);
+    _producer = p.get<std::string>("OpFlashProducer");
+  
     _PE_min_flash = 10; //50;
     _PE_min_hit = 1;
     _bin_width = 0.1; // usec
-    
+
+    _verbose = p.get<bool>("Verbosity");
+    return true;
   }
+  
+  bool SimpleFlashFinder::analyze(storage_manager* storage)
+  {
+    
+    auto const ophitHandle = storage->get_data<event_ophit>(_producer);
 
-  SimpleFlashFinder::~SimpleFlashFinder()
-  {}
+    storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
+    
+    if(!ophitHandle || ophitHandle->empty()){
+      std::cerr<<"\033[93mInvalid Producer name: \033[00m"<<_producer.c_str()<<std::endl;
+      throw std::exception();
+    }
 
-  unsigned SimpleFlashFinder::Flash(const std::vector<::larlite::ophit>& ophits) {
+    // op flash data product to be filled
+    event_opflash* opflashes = storage->get_data<event_opflash>(_name);
 
     // only use the beam-gate window to find flashes
     double beam_gate = 23.4; //usec
@@ -43,12 +66,12 @@ namespace pmtana{
     // total number of hits added
     int nhits = 0;
     
-    for(auto const& oh : *ophits)
+    for(auto const& oh : *ophitHandle)
       {
-	// ignore hits with < 5 PE
+      // ignore hits with < 5 PE
 	if(oh.PE() < _PE_min_hit) continue;
 	
-	// allocate this hit to a 100 ns bin
+      // allocate this hit to a 100 ns bin
 	double time = oh.PeakTime();
 	
 	int bin = int(time/_bin_width);
@@ -57,16 +80,16 @@ namespace pmtana{
 	  {
 	    // std::cout << "We should not hav a hit at this time. Something is wrong!" << std::endl;
 	    continue;
-	  }
+	}
       
-	OpCharge[bin][oh.OpChannel()] += oh.PE();
-	nhits +=1;
+      OpCharge[bin][oh.OpChannel()] += oh.PE();
+      nhits +=1;
 
-	// if this hit has the largest charge, adjust the flash's time
-	if( OpTime[bin].second < oh.PE() )
-	  {
-	    OpTime[bin] = std::make_pair( oh.PeakTime(), oh.PE() );
-	  }
+      // if this hit has the largest charge, adjust the flash's time
+      if( OpTime[bin].second < oh.PE() )
+	{
+	OpTime[bin] = std::make_pair( oh.PeakTime(), oh.PE() );
+	}
       } // <-- end loop over ophits
 
     // seed bin (bin with the most light)
@@ -111,16 +134,13 @@ namespace pmtana{
     for (size_t i=0; i < OpCharge.size(); i++)
       {
 	if ( TotalCharge(OpCharge.at(i)) <= _PE_min_flash) continue;
-
-	
-	_flash_v->emplace_back( OpTime.at(i).first,
-				0.05,
-				OpTime.at(i).first,
-				0,
-				OpCharge.at(i));
-      } 
-
-    return _flash_v->size();
+	opflashes->emplace_back( OpTime.at(i).first,
+				 0.05,
+				 OpTime.at(i).first,
+				 0,
+				 OpCharge.at(i));
+      }
+    return true;
   }
 
   double SimpleFlashFinder::TotalCharge(const std::vector<double>& PEs)
@@ -133,9 +153,10 @@ namespace pmtana{
     return totalPE;
   }
 
-  
-  
+  bool SimpleFlashFinder::finalize()
+  {
+    return true;
+  }
 
 }
 #endif
-

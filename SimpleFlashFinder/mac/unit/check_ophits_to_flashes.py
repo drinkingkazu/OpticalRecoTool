@@ -1,18 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[51]:
-
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -122,60 +107,28 @@ mgr.close()
 # In[53]:
 
 my_proc = fmwk.ana_processor()
-
 my_proc.add_input_file ("temp.root")
 my_proc.set_output_file("temp2.root")
-
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH) 
 #my_proc.set_data_to_write(fmwk.data.kOpFlash,'funny')
-my_module = fmwk.SimpleFlashFinder()                                                                                                        
+my_module = fmwk.SimpleFlashFinder()
 my_module.Configure("../simpleflashfindermodule.fcl")
 my_proc.add_process(my_module)
 my_proc.run()
 
-
-# In[ ]:
-
-
-
-
-# In[54]:
-
 mgr = fmwk.storage_manager()
 mgr.set_io_mode(mgr.kREAD)
 mgr.add_in_filename("temp2.root")
-
 mgr.open()
 mgr.next_event()
 event_opflash = mgr.get_data(fmwk.data.kOpFlash,'SimpleFlashFinder')
 
 
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[55]:
-
-
-
-
-# In[66]:
 
 plt.rcParams.update({'font.size': 16}) 
 fig,ax = plt.subplots(figsize=(15,6))
 
-for i in np.linspace(0,23.4+1,234):
+for i in np.linspace(0.1,23.4,234):
     ax.vlines(i,0,100,lw=1,color='red',linestyles='dashed',alpha=0.7)
 
 for h in ophits:
@@ -191,25 +144,8 @@ plt.xlabel('Time [us]')
 plt.ylabel('PE')
 plt.show()
 
-
-# In[67]:
-
 import os
 os.system('rm -r temp.root')
 os.system('rm -r temp2.root')
-
-
-# In[ ]:
-
-
-
-
-# In[57]:
-
-
-
-
-# In[ ]:
-
 
 

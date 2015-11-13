@@ -1,23 +1,29 @@
-//By David C. Ported to larlite by Brooke. ruined by vic in new framework.
+//by vic, based on David C. simple flash idea.
 
-#ifndef SIMPLEFLASHFINDER_H
-#define SIMPLEFLASHFINDER_H
+#ifndef NOTSIMPLEFLASHFINDER_H
+#define NOTSIMPLEFLASHFINDER_H
 
 namespace pmtana
 {
 
-  class SimpleFlashFinder : public FlashFinderBase {
+  class NotSimpleFlashFinder : FlashFinderBase{
 
   public:
 
-    SimpleFlashFinder();
+    NotSimpleFlashFinder();
 
-    virtual ~SimpleFlashFinder();
+    virtual ~NotSimpleFlashFinder();
 
+      
+  protected:
+    
   private:
 
     double TotalCharge(const std::vector<double>& PEs);
-
+    
+    double _min_time_integrated;
+    
+    
     // minimum PE to make a flash
     double _PE_min_flash;
 
@@ -26,8 +32,9 @@ namespace pmtana
 
     // bin-width in time
     double _bin_width;
-      
-  protected:
+    
+
+
 
   };
 
