@@ -21,8 +21,8 @@ namespace pmtana{
   }
 
   //************************************************************
-  AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset,
-  //AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset,
+  //AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset,
+  AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset,
 			       const std::string name)
     : PMTPulseRecoBase(name)
   //*******************************************************
@@ -30,9 +30,6 @@ namespace pmtana{
 
     _start_adc_thres = pset.get<double>("StartADCThreshold");
     _end_adc_thres = pset.get<double>("EndADCThreshold");
-  
-    //_nsigma = pset.get<double>("NSigmaThreshold");
-    
     _nsigma_start = pset.get<double>("NSigmaThresholdStart");
     _nsigma_end   = pset.get<double>("NSigmaThresholdEnd");
 

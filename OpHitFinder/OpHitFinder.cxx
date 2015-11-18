@@ -85,10 +85,7 @@ namespace larlite {
     else if(ped_alg_name == "PedNoContinuation")
       _ped_alg = new pmtana::PedAlgoNoContinuation(ped_pset,ped_alg_name);
     else if(ped_alg_name == "PedUB") // uboone specific 
-      _ped_alg = new pmtana::PedAlgoUB(ped_pset,ped_alg_name,
-				       new pmtana::PedAlgoRollingMean(ped_pset,ped_alg_name));
-    
-    
+      _ped_alg = new pmtana::PedAlgoUB(ped_pset,ped_alg_name);
     else {
       std::stringstream ss;
       ss << "Invalid Pedestal algorithm name: " << ped_alg_name;

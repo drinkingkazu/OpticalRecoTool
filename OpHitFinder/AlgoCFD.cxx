@@ -21,8 +21,8 @@ namespace pmtana{
   {}
 
   //*********************************************************************
-  AlgoCFD::AlgoCFD(const fhicl::ParameterSet &pset,
-  //AlgoCFD::AlgoCFD(const ::fcllite::PSet &pset,
+  //AlgoCFD::AlgoCFD(const fhicl::ParameterSet &pset,
+  AlgoCFD::AlgoCFD(const ::fcllite::PSet &pset,
 		   const std::string name)
     : PMTPulseRecoBase(name)
       //*********************************************************************

@@ -16,8 +16,8 @@
 #define ALGOTHRESHOLD_H
 
 #include "PMTPulseRecoBase.h"
-#include "fhiclcpp/ParameterSet.h"
-//#include "FhiclLite/PSet.h"
+//#include "fhiclcpp/ParameterSet.h"
+#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -38,8 +38,8 @@ namespace pmtana
     AlgoThreshold(const std::string name="AlgoThreshold");
 
     /// Alternative constructor
-    AlgoThreshold(const fhicl::ParameterSet &pset,const std::string name="AlgoThreshold");
-    //AlgoThreshold(const ::fcllite::PSet &pset,const std::string name="AlgoThreshold");
+    //AlgoThreshold(const fhicl::ParameterSet &pset,const std::string name="AlgoThreshold");
+    AlgoThreshold(const ::fcllite::PSet &pset,const std::string name="AlgoThreshold");
 
     /// Default destructor
     virtual ~AlgoThreshold();

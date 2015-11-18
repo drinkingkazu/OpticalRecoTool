@@ -21,13 +21,13 @@ namespace pmtana{
   {}
   
   //*************************************************************
-  PedAlgoUB::PedAlgoUB(const fhicl::ParameterSet &pset,
-  //PedAlgoUB::PedAlgoUB(const ::fcllite::PSet &pset,
+  //PedAlgoUB::PedAlgoUB(const fhicl::ParameterSet &pset,
+  PedAlgoUB::PedAlgoUB(const ::fcllite::PSet &pset,
 		       const std::string name)
     : PMTPedestalBase(name)
-    //, _beamgatealgo(pset.get_pset("BeamGateAlgo"),"BeamGateAlgo")
-    , _beamgatealgo(pset.get<fhicl::ParameterSet>("BeamGateAlgo"),"BeamGateAlgo")
-      //*************************************************************
+    , _beamgatealgo(pset,"BeamGateAlgo")
+  //, _beamgatealgo(pset.get<fhicl::ParameterSet>("BeamGateAlgo"),"BeamGateAlgo")
+  //*************************************************************
   {
     _beam_gate_samples = pset.get<unsigned int>("BeamGateSamples");
   }

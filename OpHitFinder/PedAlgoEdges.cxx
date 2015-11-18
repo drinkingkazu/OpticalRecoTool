@@ -24,8 +24,8 @@ namespace pmtana{
   }
 
   //*************************************************************
-  PedAlgoEdges::PedAlgoEdges(const fhicl::ParameterSet &pset,
-  //PedAlgoEdges::PedAlgoEdges(const ::fcllite::PSet &pset,
+  //PedAlgoEdges::PedAlgoEdges(const fhicl::ParameterSet &pset,
+  PedAlgoEdges::PedAlgoEdges(const ::fcllite::PSet &pset,
 			     const std::string name)
     : PMTPedestalBase(name)
   //*************************************************************

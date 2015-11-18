@@ -16,8 +16,8 @@
 #define ALGOSLIDINGWINDOW_H
 
 #include "PMTPulseRecoBase.h"
-#include "fhiclcpp/ParameterSet.h"
-//#include "FhiclLite/PSet.h"
+//#include "fhiclcpp/ParameterSet.h"
+#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -34,9 +34,9 @@ namespace pmtana
     AlgoSlidingWindow(const std::string name="SlidingWindow");
 
     /// Alternative ctor
-    AlgoSlidingWindow(const fhicl::ParameterSet &pset,const std::string name="SlidingWindow");
-    //AlgoSlidingWindow(const ::fcllite::PSet &pset,const std::string name="SlidingWindow");
-
+    //AlgoSlidingWindow(const fhicl::ParameterSet &pset,const std::string name="SlidingWindow");
+    AlgoSlidingWindow(const ::fcllite::PSet &pset,const std::string name="SlidingWindow");
+    
     /// Default destructor
     virtual ~AlgoSlidingWindow();
     

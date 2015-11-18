@@ -17,8 +17,8 @@
 
 // STL
 #include "PMTPedestalBase.h"
-#include "fhiclcpp/ParameterSet.h"
-//#include "FhiclLite/PSet.h"
+//#include "fhiclcpp/ParameterSet.h"
+#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -35,8 +35,8 @@ namespace pmtana
     PedAlgoEdges(const std::string name="PedEdges");
 
     /// Alternative ctor
-    PedAlgoEdges(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
-    //PedAlgoEdges(const ::fcllite::PSet &pset,const std::string name="PedEdges");
+    //PedAlgoEdges(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
+    PedAlgoEdges(const ::fcllite::PSet &pset,const std::string name="PedEdges");
 
     /// Default destructor
     virtual ~PedAlgoEdges();

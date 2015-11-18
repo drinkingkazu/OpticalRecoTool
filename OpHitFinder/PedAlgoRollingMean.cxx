@@ -23,11 +23,11 @@ namespace pmtana{
   }
 
   //**************************************************************************
-  PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
-  //PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
-					     const std::string name)
+  //PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
+  PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
+					 const std::string name)
     : PMTPedestalBase(name)
-      //############################################################
+  //############################################################
   {
 
     _sample_size    = pset.get<size_t>("SampleSize");

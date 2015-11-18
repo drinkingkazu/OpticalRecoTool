@@ -18,8 +18,8 @@ namespace pmtana{
   {}
 
   //*********************************************************************
-  AlgoSlidingWindow::AlgoSlidingWindow(const fhicl::ParameterSet &pset,
-  //AlgoSlidingWindow::AlgoSlidingWindow(const ::fcllite::PSet &pset,
+  //AlgoSlidingWindow::AlgoSlidingWindow(const fhicl::ParameterSet &pset,
+  AlgoSlidingWindow::AlgoSlidingWindow(const ::fcllite::PSet &pset,
 				       const std::string name)
     : PMTPulseRecoBase(name)
   //*********************************************************************

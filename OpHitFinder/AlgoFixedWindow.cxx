@@ -23,8 +23,8 @@ namespace pmtana{
   }
 
   //****************************************************************************************
-  AlgoFixedWindow::AlgoFixedWindow(const fhicl::ParameterSet &pset,
-  //AlgoFixedWindow::AlgoFixedWindow(const ::fcllite::PSet& pset,
+  //AlgoFixedWindow::AlgoFixedWindow(const fhicl::ParameterSet &pset,
+  AlgoFixedWindow::AlgoFixedWindow(const ::fcllite::PSet& pset,
 				   const std::string name)
     : PMTPulseRecoBase(name)
   //****************************************************************************************

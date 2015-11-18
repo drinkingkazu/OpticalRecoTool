@@ -17,8 +17,8 @@
 
 // STL
 #include "PMTPedestalBase.h"
-#include "fhiclcpp/ParameterSet.h"
-//#include "FhiclLite/PSet.h"
+//#include "fhiclcpp/ParameterSet.h"
+#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -35,8 +35,8 @@ namespace pmtana
     PedAlgoRollingMean(const std::string name="PedRollingMean");
 
     /// Alternative ctor
-    PedAlgoRollingMean(const fhicl::ParameterSet &pset,const std::string name="PedRollingMean");
-    //PedAlgoRollingMean(const ::fcllite::PSet &pset,const std::string name="PedRollingMean");
+    //PedAlgoRollingMean(const fhicl::ParameterSet &pset,const std::string name="PedRollingMean");
+    PedAlgoRollingMean(const ::fcllite::PSet &pset,const std::string name="PedRollingMean");
 
     /// Default destructor
     virtual ~PedAlgoRollingMean();

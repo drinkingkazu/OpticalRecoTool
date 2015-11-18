@@ -17,9 +17,9 @@
 
 // STL
 #include "PMTPedestalBase.h"
-#include "fhiclcpp/ParameterSet.h"
+//#include "fhiclcpp/ParameterSet.h"
 #include "PedAlgoRollingMean.h"
-//#include "FhiclLite/PSet.h"
+#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -36,8 +36,8 @@ namespace pmtana
     PedAlgoUB(const std::string name="PedCD");
     
     ///Alternative ctor
-    PedAlgoUB(const fhicl::ParameterSet &pset,
-    //PedAlgoUB(const ::fcllite::PSet &pset,
+    //PedAlgoUB(const fhicl::ParameterSet &pset,
+    PedAlgoUB(const ::fcllite::PSet &pset,
 	      const std::string name = "PedAlgoUB");
 
     /// Default destructor
