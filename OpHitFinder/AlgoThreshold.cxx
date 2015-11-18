@@ -21,8 +21,8 @@ namespace pmtana{
   }
 
   //************************************************************
-  //AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset,
-  AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset,
+  AlgoThreshold::AlgoThreshold(const fhicl::ParameterSet &pset,
+  //AlgoThreshold::AlgoThreshold(const ::fcllite::PSet &pset,
 			       const std::string name)
     : PMTPulseRecoBase(name)
   //*******************************************************

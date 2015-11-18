@@ -17,7 +17,9 @@
 
 // STL
 #include "PMTPedestalBase.h"
-#include "FhiclLite/PSet.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "PedAlgoRollingMean.h"
+//#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -34,11 +36,9 @@ namespace pmtana
     PedAlgoUB(const std::string name="PedCD");
     
     ///Alternative ctor
-    //PedAlgoUB(const fhicl::ParameterSet &pset,const std::string name="PedEdges");
-    //PedAlgoUB(const ::fcllite::PSet &pset,const std::string name="PedCD");
-    PedAlgoUB(const ::fcllite::PSet &pset,
-	      const std::string name,
-	      PMTPedestalBase* BeamGateAlgo);
+    PedAlgoUB(const fhicl::ParameterSet &pset,
+    //PedAlgoUB(const ::fcllite::PSet &pset,
+	      const std::string name = "PedAlgoUB");
 
     /// Default destructor
     virtual ~PedAlgoUB();
@@ -52,8 +52,8 @@ namespace pmtana
     
   private:
 
-    PMTPedestalBase * _beamgatealgo;
-    int _beam_gate_samples;
+    PedAlgoRollingMean _beamgatealgo;
+    unsigned int _beam_gate_samples;
   };
 }
 #endif

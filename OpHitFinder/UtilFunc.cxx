@@ -30,7 +30,7 @@ namespace pmtana {
     auto n_t = unsigned{0};
 	    
     for(int k = start; k < end; ++k) {
-      if (k < 0 or k > wf.size() - 1) continue;
+      if (k < 0 or k > (int)(wf.size()) - 1) continue;
       m += wf.at(k);
       ++n_t;
     }

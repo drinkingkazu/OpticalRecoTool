@@ -11,6 +11,7 @@
 #include "UtilFunc.h"
 
 #include <unordered_map>
+
 namespace pmtana{
 
   //*********************************************************************
@@ -20,8 +21,8 @@ namespace pmtana{
   {}
 
   //*********************************************************************
-  //AlgoCFD::AlgoCFD(const fhicl::ParameterSet &pset,
-  AlgoCFD::AlgoCFD(const ::fcllite::PSet &pset,
+  AlgoCFD::AlgoCFD(const fhicl::ParameterSet &pset,
+  //AlgoCFD::AlgoCFD(const ::fcllite::PSet &pset,
 		   const std::string name)
     : PMTPulseRecoBase(name)
       //*********************************************************************
@@ -35,8 +36,6 @@ namespace pmtana{
     _start_thresh     = pset.get<double>("StartThresh");
     _end_thresh       = pset.get<double>("EndThresh");
 
-    
-    
     Reset();
 
   }
@@ -66,11 +65,11 @@ namespace pmtana{
 
     // follow cfd procedure: invert waveform, multiply by constant fraction
     // add to delayed waveform.
-    for (unsigned k = 0; k < wf.size(); ++k)  {
+    for (unsigned int k = 0; k < wf.size(); ++k)  {
       
       auto delayed = -1.0 * _F *  ( (float) wf.at(k) - mean_v.at(k) );
 
-      if (k < _D)
+      if ((int)k < _D)
 	
 	cfd.push_back( delayed );
 
@@ -85,9 +84,6 @@ namespace pmtana{
 
     auto crossings = LinearZeroPointX(cfd);
     
-    double before_mean, after_mean;
-    before_mean = after_mean = 0;
-
     // lambda criteria to determine if inside pulse
     
     auto in_peak = [&wf,&sigma_v,&mean_v](int i, float thresh) -> bool
@@ -126,7 +122,7 @@ namespace pmtana{
 	//forwards
 	while ( in_peak(i,_end_thresh) ) {
 	  i++;
-	  if ( i > wf.size() - 1 ) { i = wf.size() - 1; break; }
+	  if ( i > (int)(wf.size()) - 1 ) { i = (int)(wf.size()) - 1; break; }
 	}
 		
 	_pulse.t_end = i;
@@ -146,8 +142,8 @@ namespace pmtana{
 	
 
 	//how to decide before or after? set before for now
-	if ( wf.size() < 1500 ) //it's cosmic discriminator
-	  before_mean = mean_v.front();
+	//if ( wf.size() < 1500 ) //it's cosmic discriminator
+	//before_mean = mean_v.front();
 	
 	// if( after_mean <= 0 and before_mean <= 0 ) {
 	//   std::cerr << "\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
@@ -161,7 +157,7 @@ namespace pmtana{
 	auto end_ped   = mean_v.at(_pulse.t_end);
 	
 	//just take the "smaller one"
-	_pulse.ped_mean = start_ped <= end_ped ? start_ped : end_ped;;
+	_pulse.ped_mean = start_ped <= end_ped ? start_ped : end_ped;
 
 	if(wf.size() < 50) _pulse.ped_mean = mean_v.front(); //is COSMIC DISCRIMINATOR
 
@@ -191,7 +187,7 @@ namespace pmtana{
     
     std::unordered_map<unsigned,pulse_param> delta;
     
-    unsigned width = 0;
+    //unsigned width = 0;
     for( const auto& p : pulses_copy )  {
 
       if ( delta.count(p.t_start) )  {
@@ -210,7 +206,7 @@ namespace pmtana{
     
 
     //do the same now ensure t_final's are all unique
-    width = 0;
+    //width = 0;
     
     pulses_copy.clear();
     pulses_copy = _pulse_v;

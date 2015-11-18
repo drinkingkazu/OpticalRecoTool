@@ -11,7 +11,7 @@
 #include "UtilFunc.h"
 
 //#include <ctime>
-
+#include <iostream>
 namespace pmtana{
 
   //*****************************************************************
@@ -23,8 +23,8 @@ namespace pmtana{
   }
 
   //**************************************************************************
-  //PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
-  PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
+  PedAlgoRollingMean::PedAlgoRollingMean(const fhicl::ParameterSet &pset,
+  //PedAlgoRollingMean::PedAlgoRollingMean(const ::fcllite::PSet &pset,
 					     const std::string name)
     : PMTPedestalBase(name)
       //############################################################

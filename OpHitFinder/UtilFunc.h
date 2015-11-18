@@ -2,7 +2,7 @@
 #define larana_OPTICALDETECTOR_UTILFUNC_H
 
 #include "OpticalRecoTypes.h"
-
+#include <cstddef>
 namespace pmtana {
   
   double mean(const std::vector<short>& wf, size_t start=0, size_t nsample=0);

@@ -39,7 +39,7 @@ namespace pmtana{
   {
     if(!algo) throw OpticalRecoException("Invalid Pedestal algorithm!");
     _ped_algo = algo;
-  };
+  }
 
   //**********************************************************************
   bool PulseRecoManager::Reconstruct(const pmtana::Waveform_t &wf) const

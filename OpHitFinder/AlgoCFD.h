@@ -16,8 +16,8 @@
 #define ALGOCFD_H
 
 #include "PMTPulseRecoBase.h"
-//#include "fhiclcpp/ParameterSet.h"
-#include "FhiclLite/PSet.h"
+#include "fhiclcpp/ParameterSet.h"
+//#include "FhiclLite/PSet.h"
 
 namespace pmtana
 {
@@ -34,8 +34,8 @@ namespace pmtana
     AlgoCFD(const std::string name="CFD");
 
     /// Alternative ctor
-    //AlgoCFD(const fhicl::ParameterSet &pset,const std::string name="SlidingWindow");
-    AlgoCFD(const ::fcllite::PSet &pset,const std::string name="CFD");
+    AlgoCFD(const fhicl::ParameterSet &pset,const std::string name="CFD");
+    //AlgoCFD(const ::fcllite::PSet &pset,const std::string name="CFD");
 
     /// Default destructor
     virtual ~AlgoCFD();
