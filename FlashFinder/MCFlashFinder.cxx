@@ -68,7 +68,7 @@ namespace larlite {
 	for(auto const& oneph : simph) {
 
 	  if( mct > (oneph.Time+100) ) {
-	    std::cout<<"Ignoring photon @ " << oneph.Time << " from interaction @ " << mct << std::endl;
+	    //std::cout<<"Ignoring photon @ " << oneph.Time << " from interaction @ " << mct << std::endl;
 	    continue;
 	  }
 
@@ -83,7 +83,7 @@ namespace larlite {
     auto const ts = larutil::TimeService::GetME();
 	
     for(size_t mcf_idx=0; mcf_idx < flash_time_v.size(); ++mcf_idx) {
-
+      std::cout<<mcf_idx<<std::endl;
       opflash f( ts->G4ToElecTime(flash_time_v[mcf_idx]) - trig_time,       // flash time w.r.t. trigger
 		 0,                                       // time width
 		 ts->G4ToElecTime(flash_time_v[mcf_idx]), // flash time in elec clock
@@ -119,7 +119,7 @@ namespace larlite {
 	for(auto const& oph : *event_oph) {
 	  if(oph.OpChannel() > 31) continue;
 	  if(oph.PeakTimeAbs() < mc_electime || oph.PeakTimeAbs() > (mc_electime + 8)) {
-	    std::cout << "Ignoring pulse @ " << oph.PeakTimeAbs() << " trigger = " << trig_time << std::endl;
+	    //std::cout << "Ignoring pulse @ " << oph.PeakTimeAbs() << " trigger = " << trig_time << std::endl;
 	    continue;
 	  }
 	  pe_v[oph.OpChannel()] += oph.PE();
