@@ -1,23 +1,26 @@
 FlashFinder:
 {
-#    FlashFinderAlgo : SimpleFlashFinder
-    FlashFinderAlgo : NotSimpleFlashFinder
-    OpHitProducer   : OpHitFinder
-    OpFlashProducer : OpFlashFinder
+    FlashFinderAlgo : SimpleFlashFinder
+    #FlashFinderAlgo : NotSimpleFlashFinder
+    OpHitProducer   : ophitSat
+    OpFlashProducer : simpleFlash
   
   
 }
 
-
-
 SimpleFlashFinder:
 {
-
-
+  PEThreshold:    15
+  MinPECoinc:     5
+  MinMultCoinc:   3
+  IntegralTime:   8.
+  PreSample:      0.1
+  VetoSize:       8.
+  TimeResolution: 0.03
 }
 
 NotSimpleFlashFinder:
 {
-    MinTimeIntegrated: .350 #in microseconds
+    MinTimeIntegrated: 8. #in microseconds
 
 }
