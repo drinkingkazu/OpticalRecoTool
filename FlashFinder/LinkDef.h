@@ -14,7 +14,7 @@
 
 #pragma link C++ namespace pmtana+;
 #pragma link C++ class larlite::FlashFinder+;
-
+#pragma link C++ class larlite::MCFlashFinder+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ class pmtana::FlashFinderManager+;

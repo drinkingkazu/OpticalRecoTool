@@ -61,11 +61,11 @@ namespace larlite {
 
     //if (n_flashes > 0 ) std::cout << "Found: " << n_flashes << "\n";
 
-    *opflashes = _preco_alg->GetFlashes();
+    //*opflashes = _preco_alg->GetFlashes();
     
-    // for(const auto& flash :  _preco_alg->GetFlashes() ) 
+    for(const auto& flash :  _preco_alg->GetFlashes() ) 
 
-    // opflashes->push_back(flash);
+      opflashes->push_back(flash);
     
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
     

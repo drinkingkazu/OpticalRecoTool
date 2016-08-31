@@ -24,13 +24,28 @@ namespace pmtana
     double TotalCharge(const std::vector<double>& PEs);
 
     // minimum PE to make a flash
-    double _PE_min_flash;
+    double _min_pe_flash;
+
+    // minimum PE to make a flash candidate
+    double _min_pe_coinc;
 
     // minimum PE to use an OpHit
-    double _PE_min_hit;
+    double _min_mult_coinc;
 
-    // bin-width in time
-    double _bin_width;
+    // integral period
+    double _integral_time;
+
+    // veto time
+    double _veto_time;
+
+    // time resolution of pe sum
+    double _time_res;
+
+    // time pre-sample
+    double _pre_sample;
+
+    // pw aum array
+    std::vector<double> _pesum_v;
       
   protected:
 
