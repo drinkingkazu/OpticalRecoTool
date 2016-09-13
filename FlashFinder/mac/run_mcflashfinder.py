@@ -28,9 +28,25 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 # Replace with your analysis unit if you wish.
 #my_proc.add_process(fmwk.ana_base())
 my_proc.add_process(fmwk.MCFlashFinder())
-my_module = fmwk.FlashFinder()
-my_module.Configure("flashfindermodule.fcl")
-my_proc.add_process(my_module)
+
+my_module1 = fmwk.CheatFlashFinder()
+my_module1.SetIOProducer("ophitSatBeam","cheatFlashBeam")
+my_proc.add_process(my_module1)
+
+my_module2 = fmwk.CheatFlashFinder()
+my_module2.SetIOProducer("ophitSatCosmic","cheatFlashCosmic")
+my_module2.EmulateFEM(True)
+my_proc.add_process(my_module2)
+
+my_module3 = fmwk.FlashFinder()
+my_module3.Configure("beamflash.fcl")
+my_proc.add_process(my_module3)
+
+my_module4 = fmwk.FlashFinder()
+my_module4.Configure("cosmicflash.fcl")
+my_proc.add_process(my_module4)
+
+#my_proc.set_verbosity(0)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"

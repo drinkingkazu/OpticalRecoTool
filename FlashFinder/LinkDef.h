@@ -15,13 +15,15 @@
 #pragma link C++ namespace pmtana+;
 #pragma link C++ class larlite::FlashFinder+;
 #pragma link C++ class larlite::MCFlashFinder+;
+#pragma link C++ class larlite::CheatFlashFinder+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ class pmtana::FlashFinderManager+;
 
-#pragma link C++ class pmtana::FlashFinderBase+;
-#pragma link C++ class pmtana::SimpleFlashFinder+;
-#pragma link C++ class pmtana::NotSimpleFlashFinder+;
+//#pragma link C++ class pmtana::FlashAlgoBase+;
+//#pragma link C++ class pmtana::SimpleFlashAlgo+;
+//#pragma link C++ class pmtana::NotSimpleFlashFinder+;
 
 #endif
+
 

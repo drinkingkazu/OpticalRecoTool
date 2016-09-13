@@ -4,7 +4,8 @@
 #ifndef FLASHFINDERMANAGER_H
 #define FLASHFINDERMANAGER_H
 
-#include "FlashFinderBase.h"
+#include "FlashAlgoBase.h"
+#include "FlashAlgoFactory.h"
 
 namespace pmtana
 {
@@ -17,14 +18,13 @@ namespace pmtana
     
     ~FlashFinderManager();
 
-    void SetFlashAlgo (FlashFinderBase* algo);
+    void SetFlashAlgo (FlashAlgoBase* algo);
 
-    unsigned CreateFlashes(const larlite::event_ophit* ophits) const;
+    LiteOpFlashArray_t RecoFlash(const LiteOpHitArray_t& ophits) const;
     
   private:
     
-    FlashFinderBase* _flash_algo;
-
+    FlashAlgoBase* _flash_algo;
   };
   
 }

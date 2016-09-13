@@ -19,23 +19,32 @@ for x in xrange(len(sys.argv)-1):
 # Specify IO mode
 my_proc.set_io_mode(fmwk.storage_manager.kBOTH)
 
-my_proc.set_output_file("flasher_out.root")
+my_proc.set_output_file('out.root')
 
-#my_proc.set_data_to_write(fmwk.data.kOpHit,"OpHitFinder")
-
+# Specify output root file name
+my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 
 # Attach an analysis unit ... here we use a base class which does nothing.
 # Replace with your analysis unit if you wish.
-my_module = fmwk.FlashFinder()
-my_module.Configure("flashfindermodule.fcl")
-my_proc.add_process(my_module)
+#my_proc.add_process(fmwk.ana_base())
+#my_proc.add_process(fmwk.MCFlashFinder())
+
+my_module3 = fmwk.FlashFinder()
+my_module3.Configure("beamflash.fcl")
+my_proc.add_process(my_module3)
+
+my_module4 = fmwk.FlashFinder()
+my_module4.Configure("cosmicflash.fcl")
+my_proc.add_process(my_module4)
+
+#my_proc.set_verbosity(0)
 
 print
 print  "Finished configuring ana_processor. Start event loop!"
 print
 
 # Let's run it.
-my_proc.run();
+my_proc.run()
 
 # done!
 print

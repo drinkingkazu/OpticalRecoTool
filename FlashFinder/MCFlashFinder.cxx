@@ -3,8 +3,6 @@
 
 #include "MCFlashFinder.h"
 #include "DataFormat/opflash.h"
-#include "DataFormat/opdetwaveform.h"
-#include "DataFormat/ophit.h"
 #include "DataFormat/simphotons.h"
 #include "DataFormat/mctruth.h"
 #include "DataFormat/trigger.h"
@@ -21,8 +19,6 @@ namespace larlite {
   
     auto const& event_mct   = storage->get_data<event_mctruth>("generator");
     auto const& event_simph = storage->get_data<event_simphotons>("largeant");
-    auto const& event_oph   = storage->get_data<event_ophit>("ophitSat");
-    auto const& event_opwf  = storage->get_data<event_opdetwaveform>("saturation");
     auto const& event_trig  = storage->get_data<trigger>("triggersim");
 
     if(!event_mct   || event_mct->empty()   ) { std::cout << "No mctruth found"   << std::endl; return false; }
@@ -31,13 +27,16 @@ namespace larlite {
 
     auto event_mcflash = storage->get_data<event_opflash>("mcflash");
     if(!event_mcflash) { std::cout << "mcflash could not be created..." << std::endl; return false; }
+    event_mcflash->clear();
 
     // Flash data product is fucking annoyingly only-set-all-in-constructor style by stupid coder Brian Rabel
     std::vector<double> flash_time_v;
     
-    for(auto const& mct : *event_mct)
+    for(auto const& mct : *event_mct) {
 
-      flash_time_v.push_back(mct.GetParticles().front().Trajectory().front().T());
+      for(auto const& p : mct.GetParticles()) flash_time_v.push_back(p.Trajectory().front().T());
+
+    }
 
     if(flash_time_v.empty()) return true;
     
@@ -83,7 +82,6 @@ namespace larlite {
     auto const ts = larutil::TimeService::GetME();
 	
     for(size_t mcf_idx=0; mcf_idx < flash_time_v.size(); ++mcf_idx) {
-      std::cout<<mcf_idx<<std::endl;
       opflash f( ts->G4ToElecTime(flash_time_v[mcf_idx]) - trig_time,       // flash time w.r.t. trigger
 		 0,                                       // time width
 		 ts->G4ToElecTime(flash_time_v[mcf_idx]), // flash time in elec clock
@@ -100,48 +98,6 @@ namespace larlite {
 
       event_mcflash->emplace_back(std::move(f));
     }
-
-    // Make cheater flash
-    auto event_cflash = storage->get_data<event_opflash>("cheatFlash");
-    if(event_oph && event_opwf && event_oph->size()) {
-
-      // Get beamwindow start t
-      double wf_start=0;
-      for(auto const& wf : *event_opwf) {
-	if(wf.size() < 1000) continue;
-	wf_start = wf.TimeStamp();
-	break;
-      }
-      for(auto const& mc_g4time : flash_time_v) {
-
-	double mc_electime = ts->G4ToElecTime(mc_g4time);
-	std::vector<double> pe_v(geo->NOpDets(),0);
-	for(auto const& oph : *event_oph) {
-	  if(oph.OpChannel() > 31) continue;
-	  if(oph.PeakTimeAbs() < mc_electime || oph.PeakTimeAbs() > (mc_electime + 8)) {
-	    //std::cout << "Ignoring pulse @ " << oph.PeakTimeAbs() << " trigger = " << trig_time << std::endl;
-	    continue;
-	  }
-	  pe_v[oph.OpChannel()] += oph.PE();
-	}
-	
-	opflash f( ts->G4ToElecTime(mc_g4time) - trig_time,       // flash time w.r.t. trigger
-		   0,                           // time width
-		   ts->G4ToElecTime(mc_g4time), // flash time in elec clock
-		   0,                           // FIXME frame number
-		   pe_v,                        // PE array
-		   false,                       // FIXME in beam frame boolean
-		   0,                           // FIXME on beam time boolean
-		   1,                           // FIXME fast-to-total pe ratio
-		   0,                           // FIXME y center
-		   0,                           // FIXME y width
-		   0,                           // FIXME z center
-		   0                            // FIXME z width
-		 );
-	
-	event_cflash->emplace_back(std::move(f));
-      }
-    }    
 
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
     

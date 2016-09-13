@@ -18,7 +18,7 @@
 #include "Analysis/ana_base.h"
 
 #include "FhiclLite/ConfigManager.h"
-#include "FlashFinderBase.h"
+#include "FlashAlgoBase.h"
 #include "FlashFinderManager.h"
 
 namespace larlite {
@@ -43,19 +43,16 @@ namespace larlite {
     { _config_file = cfg_file; }
 
     unsigned CreateFlashes(const event_ophit* ophits) const;
-    
-  protected:
 
   private:
     std::string _config_file;
     
     ::fcllite::ConfigManager     _cfg_mgr;
-    ::pmtana::FlashFinderManager _preco_mgr;
-    ::pmtana::FlashFinderBase* _preco_alg;
+    ::pmtana::FlashFinderManager _mgr;
 
     std::string _flash_producer;
     std::string _hit_producer;
-    std::string _flash_algo;
+
   };
 }
 #endif
