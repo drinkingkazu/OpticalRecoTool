@@ -10,8 +10,8 @@
 #include "PedAlgoRollingMean.h"
 #include "UtilFunc.h"
 
-//#include <ctime>
 #include <iostream>
+#include <cmath>
 namespace pmtana{
 
   //*****************************************************************
@@ -19,7 +19,6 @@ namespace pmtana{
     : PMTPedestalBase(name)
       //*****************************************************************
   {
-    srand(static_cast<unsigned int>(time(0)));
   }
 
   //**************************************************************************
@@ -32,20 +31,20 @@ namespace pmtana{
 
     _sample_size    = pset.get<size_t>("SampleSize");
     _max_sigma      = pset.get<float> ("MaxSigma");
+    
     _ped_range_max  = pset.get<float> ("PedRangeMax");
     _ped_range_min  = pset.get<float> ("PedRangeMin");
 
-    // _range          = pset.get<int>   ("RandomRange");
-    // _divisions      = pset.get<double>("RandomRangeDivisions");
+    _ped_range_quiet_min = pset.get<short>("PedRangeQuietMin");
+    _ped_range_quiet_max = pset.get<short>("PedRangeQuietMax");
+    
     _threshold      = pset.get<double>("Threshold");
+
     _diff_threshold = pset.get<double>("DiffBetweenGapsThreshold");
     _diff_adc_count = pset.get<double>("DiffADCCounts");
 
     _n_presamples   = pset.get<int>("NPrePostSamples");
     
-    //_random_shift   = pset.get<double>("RandomRangeShift");
-    // Random seed number generator
-    //srand(static_cast<unsigned int>(time(0)));
   }
 
   //*******************************************
@@ -59,7 +58,7 @@ namespace pmtana{
 					    pmtana::PedestalSigma_t&  sigma_v)
   //****************************************************************************
   {
-
+    
     // parameters
     if(wf.size()<=(_sample_size * 2))
       return false;
@@ -133,14 +132,8 @@ namespace pmtana{
 
     unsigned nbins = 1000;  
 
-    //////////////////seg faulting...
     const auto mode_mean  = BinnedMaxOccurrence(mean_v ,nbins);
     const auto mode_sigma = BinnedMaxOccurrence(sigma_v,nbins);
-
-    //auto mode_mean  = BinnedMaxTH1D(mean_v ,nbins);
-    //auto mode_sigma = BinnedMaxTH1D(sigma_v,nbins);
-
-    //std::cout<<mode_mean<<" +/- "<<mode_sigma<<std::endl;
 
     _diff_threshold *= mode_sigma;
     
@@ -148,16 +141,20 @@ namespace pmtana{
 
     int last_good_index = -1;
 
+    bool quiet_condition = false;
+    bool thresh_condition = false;
+    bool range_condition = false;
+    
     for(size_t i=0; i < wf.size(); ++i) {
       
       auto const mean  = mean_v[i];
       auto const sigma = sigma_v[i];
-
-      // if(sigma <= _max_sigma && mean < _ped_range_max && mean > _ped_range_min) {
-      // not sure if this works well for basline that is "linear" seen by David K
       
-      if(sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma) {
+      quiet_condition  = (sigma <= _threshold * mode_sigma);
+      thresh_condition = (fabs(mean - mode_mean) <= _threshold * mode_sigma);
+      range_condition  = (mean <= _ped_range_quiet_max && mean >= _ped_range_quiet_min);
 
+      if(quiet_condition && ( thresh_condition || range_condition ) ) {
 	if(last_good_index<0) {
 	  last_good_index = (int)i;
 	  continue;
@@ -188,7 +185,6 @@ namespace pmtana{
 	    auto constant_mean = diff_pre <= diff_post ? presample_mean : postsample_mean;
 	    
 	    for(size_t j = last_good_index + 1; j < i; ++j) {
-	      //mean_v.at(j)  = floor( mean_v.at(last_good_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	      mean_v.at(j)  = constant_mean;
 	      sigma_v.at(j) = mode_sigma;
 	    }
@@ -204,13 +200,22 @@ namespace pmtana{
     //      to be tuned until I can make unit test
     // update: yes this needs work...
 
-    if(sigma_v.front() > mode_sigma) {
+    //quiet_condition = sigma_v.front() <= _threshold * mode_sigma && fabs(mean_v.front() - mode_mean) <= _threshold * mode_sigma;
+    quiet_condition  = (sigma_v.front() <= _threshold * mode_sigma);
+    //quiet_condition &= (mean_v.front() <= _ped_range_quiet_max && mean_v.front() >= _ped_range_quiet_min);
+    
+    if(!quiet_condition) {
 
       int first_index  = -1;
       int second_index = -1;
 
       for(size_t i=0; i < wf.size(); ++i) {
-	if( sigma_v.at(i) < mode_sigma ) {
+	auto const mean  = mean_v[i];
+	auto const sigma = sigma_v[i];
+	//quiet_condition = sigma <= _threshold * mode_sigma && fabs(mean - mode_mean) <= _threshold * mode_sigma;
+	quiet_condition  = (sigma <= _threshold * mode_sigma);
+	//quiet_condition &= (mean <= _ped_range_quiet_max && mean >= _ped_range_quiet_min);
+	if( quiet_condition ) {
 	  if( first_index < 0 ) first_index = (int)i;
 	  else if( second_index < 0 ) {
 	    second_index = (int)i;
@@ -220,7 +225,7 @@ namespace pmtana{
       }
       
       if(first_index < 0 || second_index < 0) {
-	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CDF"
+	std::cerr <<"\033[93m<<" << __FUNCTION__ << ">>\033[00m Could not find good pedestal for CFD"
 		  << "\n"
 		  << "first_index:  " << first_index << "\n"
 		  << "second_index: " << second_index << "\n"
@@ -246,7 +251,6 @@ namespace pmtana{
 	auto postsample_mean = edge_aware_mean(wf,first_index, first_index + _n_presamples);
 
 	for(int j=0; j < first_index; ++j) {
-	  //mean_v.at(j)  = floor( mean_v.at(second_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	  mean_v.at(j)  = postsample_mean;
 	  sigma_v.at(j) = mode_sigma;
 	}
@@ -254,14 +258,23 @@ namespace pmtana{
       
     }
     
+    //quiet_condition = sigma_v.back() <= _threshold * mode_sigma && fabs(mean_v.back() - mode_mean) <= _threshold * mode_sigma;
+    quiet_condition  = (sigma_v.back() <= _threshold * mode_sigma);
+    //quiet_condition &= (mean_v.back()  <= _ped_range_quiet_max && mean_v.back() >= _ped_range_quiet_min);
     
-    if(sigma_v.back() > mode_sigma) {
-
+    if(!quiet_condition) {    
+      
       int first_index  = -1;
       int second_index = -1;
       
       for(int i = wf.size()-1; i >= 0; --i) {
-	if(sigma_v.at(i) < mode_sigma) {
+	auto const mean  = mean_v[i];
+	auto const sigma = sigma_v[i];
+	
+	quiet_condition  = (sigma <= _threshold * mode_sigma);
+	//quiet_condition &= (mean  <= _ped_range_quiet_max && mean >= _ped_range_quiet_min);
+	
+	if(quiet_condition) {
 	  if( second_index < 0 ) second_index = (int)i;
 	  else if( first_index < 0 ) {
 	    first_index = (int)i;
@@ -297,7 +310,6 @@ namespace pmtana{
 	auto presample_mean  = edge_aware_mean(wf,first_index - _n_presamples, second_index);
 	
 	for(int j = second_index+1; j < int(wf.size()); ++j) {
-	  //mean_v.at(j)  = floor( mean_v.at(first_index) ) + _random_shift + (double) ( rand() % _range) / _divisions;
 	  mean_v.at(j)  = presample_mean;
 	  sigma_v.at(j) = mode_sigma;
 	}

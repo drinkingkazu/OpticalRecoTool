@@ -86,7 +86,10 @@ PedUB :
     MaxSigma:        0.5
     PedRangeMax:     2150
     PedRangeMin:     100
-    
+
+    PedRangeQuietMax: 2052
+    PedRangeQuietMin: 2048
+
     # RandomRange: 5
     # RandomRangeDivisions: 4.0
     Threshold: 4
@@ -95,7 +98,7 @@ PedUB :
     # RandomRangeShift: -0.5
     
     # This parameter get's multiplied by mode_sigma to determine
-    # whether or not samples are close enough to be filled with random baseline
+    # whether or not samples are close enough to be filled with baseline
     # between gaps
     
     DiffBetweenGapsThreshold: 2
@@ -154,5 +157,5 @@ OpHitFinder:
 
   Pedestal: PedUB
   # HitFinder: Threshold
-   HitFinder: CFD
+  HitFinder: CFD
 }

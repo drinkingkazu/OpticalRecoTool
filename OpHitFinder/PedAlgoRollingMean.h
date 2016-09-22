@@ -54,14 +54,14 @@ namespace pmtana
     float  _max_sigma;
     float  _ped_range_max;
     float  _ped_range_min;
-
-    // int     _range;
-    // double _divisions;
     double _threshold;
     double _diff_threshold;
     double _diff_adc_count; 
 
     int _n_presamples;
+
+    short _ped_range_quiet_min;
+    short _ped_range_quiet_max;
     
     //double _random_shift;
 
