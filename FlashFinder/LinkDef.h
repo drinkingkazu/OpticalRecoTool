@@ -16,6 +16,8 @@
 #pragma link C++ class larlite::FlashFinder+;
 #pragma link C++ class larlite::MCFlashFinder+;
 #pragma link C++ class larlite::CheatFlashFinder+;
+#pragma link C++ class larlite::FlashComp+;
+#pragma link C++ class larlite::CosmicCalib+;
 //ADD_NEW_CLASS ... do not change this line
 
 #pragma link C++ class pmtana::FlashFinderManager+;

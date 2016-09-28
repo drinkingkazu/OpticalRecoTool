@@ -20,7 +20,7 @@
 #include "FhiclLite/ConfigManager.h"
 #include "FlashAlgoBase.h"
 #include "FlashFinderManager.h"
-
+#include "PECalib.h"
 namespace larlite {
 
   class FlashFinder : public ana_base {
@@ -46,10 +46,10 @@ namespace larlite {
 
   private:
     std::string _config_file;
-    
+    bool _beam_flash;
     ::fcllite::ConfigManager     _cfg_mgr;
     ::pmtana::FlashFinderManager _mgr;
-
+    ::pmtana::PECalib _pecalib;
     std::string _flash_producer;
     std::string _hit_producer;
 

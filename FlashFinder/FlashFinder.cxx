@@ -27,10 +27,14 @@ namespace larlite {
     _flash_producer = p.get<std::string>("OpFlashProducer");
 
     auto const flash_algo = p.get<std::string>("FlashFinderAlgo");
-    auto const flash_pset = main_cfg.get_pset(flash_algo);
+    auto const flash_pset = main_cfg.get<pmtana::Config_t>(flash_algo);
     auto algo_ptr = ::pmtana::FlashAlgoFactory::get().create(flash_algo,flash_algo);
     algo_ptr->Configure(flash_pset);
     _mgr.SetFlashAlgo(algo_ptr);
+
+    _pecalib.Configure(main_cfg.get<pmtana::Config_t>(p.get<std::string>("PECalib")));
+
+    _beam_flash = p.get<bool>("BeamFlash");
     
     return true;
   }
@@ -61,7 +65,9 @@ namespace larlite {
       ::pmtana::LiteOpHit_t loph;
       if(trigger_time > 1.e20) trigger_time = oph.PeakTimeAbs() - oph.PeakTime();
       loph.peak_time = oph.PeakTime();
-      loph.pe = oph.PE();
+
+      size_t opdet = ::pmtana::OpDetFromOpChannel(oph.OpChannel());
+      loph.pe = ( _beam_flash ? _pecalib.BeamPE(opdet,oph.Area(),oph.Amplitude()) : _pecalib.CosmicPE(opdet,oph.Area(),oph.Amplitude()) );
       loph.channel = oph.OpChannel();
       ophits.emplace_back(std::move(loph));
     }
