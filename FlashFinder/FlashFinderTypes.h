@@ -23,6 +23,7 @@ namespace pmtana {
 
   struct LiteOpFlash_t {
     std::vector<double> channel_pe;
+    std::vector<unsigned int> asshit_idx;
     double time;
     double time_err;
     
@@ -30,8 +31,12 @@ namespace pmtana {
 		     time(kINVALID_TIME)
     {}
 
-    LiteOpFlash_t(double flash_time, double flash_time_err, std::vector<double>&& pe_array)
+    LiteOpFlash_t(double flash_time,
+		  double flash_time_err,
+		  std::vector<double>&& pe_array,
+		  std::vector<unsigned int>&& hit_idx)
       : channel_pe(std::move(pe_array))
+      , asshit_idx(std::move(hit_idx))
     { time = flash_time; time_err = flash_time_err; }
     
     void Register(size_t channel, double pe)

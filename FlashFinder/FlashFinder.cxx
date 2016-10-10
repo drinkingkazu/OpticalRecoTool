@@ -43,10 +43,16 @@ namespace larlite {
 
     event_opflash* opflashes = storage->get_data<event_opflash>(_flash_producer);
     if(!opflashes) {
-      std::cerr<<"\033[93mFailed to create an output w/ name: \033[00m"<<_flash_producer.c_str()<<std::endl;
+      std::cerr<<"\033[93mFailed to create an output flash w/ name: \033[00m"<<_flash_producer.c_str()<<std::endl;
       throw std::exception();
     }
-    opflashes->clear();
+    event_ass* asshitHandle = storage->get_data<event_ass>(_flash_producer);
+    if(!asshitHandle) {
+      std::cerr<<"\033[93mFailed to create an output association w/ name: \033[00m"<<_flash_producer.c_str()<<std::endl;
+      throw std::exception();
+    }    
+    opflashes->clear_data();
+    asshitHandle->clear_data();
     storage->set_id(storage->run_id(),storage->subrun_id(),storage->event_id());
 
     auto const ophitHandle = storage->get_data<event_ophit>(_hit_producer);
@@ -75,6 +81,8 @@ namespace larlite {
     auto const flash_v = _mgr.RecoFlash(ophits);
 
     auto const ts = ::larutil::TimeService::GetME();
+    AssSet_t ass_flash2hit;
+    ass_flash2hit.reserve(flash_v.size());
     for(const auto& lflash :  flash_v) {
       //std::cout<<lflash.time<<std::endl;
       larlite::opflash flash(lflash.time, lflash.time_err,
@@ -82,7 +90,10 @@ namespace larlite {
 			     ts->OpticalClock().Frame(trigger_time + lflash.time),
 			     lflash.channel_pe);
       opflashes->emplace_back(std::move(flash));
+      ass_flash2hit.push_back(lflash.asshit_idx);
     }
+
+    asshitHandle->set_association(opflashes->id(),ophitHandle->id(),ass_flash2hit);
     
     return true;
   }

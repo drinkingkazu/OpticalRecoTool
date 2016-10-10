@@ -85,6 +85,7 @@ namespace pmtana{
     //static std::vector<double> pesum_v;
     static std::vector<double> mult_v;  //< this is not strictly a multiplicity of PMTs, but multiplicity of hits
     static std::vector<std::vector<double> > pespec_v;
+    static std::vector<std::vector<unsigned int> > hitidx_v;
     double min_time=1.1e20;
     double max_time=1.1e20;
     for(auto const& oph : ophits) {
@@ -97,17 +98,20 @@ namespace pmtana{
       std::cout << "T span: " << min_time << " => " << max_time << " ... " << (size_t)((max_time - min_time) / _time_res) << std::endl;
 
     size_t nbins_pesum_v = (size_t)((max_time - min_time) / _time_res) + 1;
-    if(_pesum_v.size()  < nbins_pesum_v) _pesum_v.resize(nbins_pesum_v,0);
+    if(_pesum_v.size() < nbins_pesum_v) _pesum_v.resize(nbins_pesum_v,0);
     if(mult_v.size()   < nbins_pesum_v) mult_v.resize(nbins_pesum_v,0);
     if(pespec_v.size() < nbins_pesum_v) pespec_v.resize(nbins_pesum_v,std::vector<double>(NOpDet));
+    if(hitidx_v.size() < nbins_pesum_v) hitidx_v.resize(nbins_pesum_v,std::vector<unsigned int>());
     for(size_t i=0; i<_pesum_v.size(); ++i) {
       _pesum_v[i] = 0;
       mult_v[i]  = 0;
+      hitidx_v[i].clear();
       for(auto& v : pespec_v[i]) v=0;
     }
 
     // Fill _pesum_v
-    for(auto const& oph : ophits) {
+    for(size_t hitidx = 0; hitidx < ophits.size(); ++hitidx) {
+      auto const& oph = ophits[hitidx];
       if(oph.channel >= _opch_v.size() || _opch_v[oph.channel] < 0) {
 	if(_debug) std::cout << "Ignoring OpChannel " << oph.channel << std::endl;
 	continue;
@@ -120,6 +124,7 @@ namespace pmtana{
       _pesum_v[index] += oph.pe;
       mult_v[index] += 1;
       pespec_v[index][_opch_v[oph.channel]] += oph.pe;
+      hitidx_v[index].push_back(hitidx);
     }
 
     // Order by pe (above threshold)
@@ -220,6 +225,12 @@ namespace pmtana{
 	if(pe_v[pmt] < 0) pe_v[pmt] = 0.;
       }
 
+      std::vector<unsigned int> asshit_v;
+      for(size_t index=start; index<(start+period) && index<pespec_v.size(); ++index) {
+	for(auto const& idx : hitidx_v[index])
+	  asshit_v.push_back(idx);
+      }
+
       if(_debug) {
 	std::cout << "Claiming a flash @ " << min_time + time * _time_res
 		  << " : " << std::flush;
@@ -230,7 +241,8 @@ namespace pmtana{
 
       LiteOpFlash_t flash( min_time + time * _time_res,
 			   period * _time_res / 2.,
-			   std::move(pe_v) );
+			   std::move(pe_v),
+			   std::move(asshit_v));
       res.emplace_back( std::move(flash) );
 
     }
