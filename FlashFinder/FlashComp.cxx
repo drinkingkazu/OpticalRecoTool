@@ -68,13 +68,15 @@ namespace larlite {
     }
     
     std::vector<std::pair<double,double> > opflash_info_v;
-    opflash_info_v.reserve(ev_opflash->size());
-    // Loop over Opflash
-    for(auto const& opf : *ev_opflash) {
-      double totpe = 0;
-      for(size_t i=0; i<32; ++i) totpe += opf.PE(i);
-      if(totpe <10) continue;
-      opflash_info_v.emplace_back(std::move(std::pair<double,double>(opf.Time(),totpe)));
+    if(ev_opflash) {
+      opflash_info_v.reserve(ev_opflash->size());
+      // Loop over Opflash
+      for(auto const& opf : *ev_opflash) {
+	double totpe = 0;
+	for(size_t i=0; i<32; ++i) totpe += opf.PE(i);
+	if(totpe <10) continue;
+	opflash_info_v.emplace_back(std::move(std::pair<double,double>(opf.Time(),totpe)));
+      }
     }
     
     std::vector<std::pair<double,double> > cheat_info_v;
