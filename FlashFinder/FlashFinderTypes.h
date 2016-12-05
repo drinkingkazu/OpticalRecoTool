@@ -3,11 +3,14 @@
 
 #include <vector>
 #include <climits>
+#include <limits>
+
 
 namespace pmtana {
 
   static const double kINVALID_TIME = std::numeric_limits<double>::max();
   static const unsigned int kINVALID_CHANNEL = std::numeric_limits<unsigned int>::max();
+  using ::std::size_t;
 
   struct LiteOpHit_t {
     size_t channel;

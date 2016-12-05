@@ -20,13 +20,18 @@
 #include <numeric>
 #include <functional>
 #include <algorithm>
+#include <cstddef>
+
 
 namespace pmtana{
-/**
+using ::std::size_t;
+
+  /**
    \class PECalib
    User defined class PECalib ... these comments are used to generate
    doxygen documentation!
  */
+  
 
   class PECalib {
     
