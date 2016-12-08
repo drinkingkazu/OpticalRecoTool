@@ -22,7 +22,6 @@ namespace larlite {
 
     auto const& event_mct   = storage->get_data<event_mctruth>("generator");
     auto const& event_oph   = storage->get_data<event_ophit>(_ophit_producer);
-    auto const& event_opwf  = storage->get_data<event_opdetwaveform>("saturation");
     auto const& event_trig  = storage->get_data<trigger>("triggersim");
 
     if(!event_mct   || event_mct->empty()   ) { std::cout << "No mctruth found"   << std::endl; return false; }
@@ -33,7 +32,8 @@ namespace larlite {
     
     for(auto const& mct : *event_mct) {
 
-      for(auto const& p : mct.GetParticles()) flash_time_v.push_back(p.Trajectory().front().T());
+      for(auto const& p : mct.GetParticles()) 
+	flash_time_v.push_back(p.Trajectory().front().T());
 
     }
 
@@ -89,24 +89,24 @@ namespace larlite {
     // Make cheater flash
     auto event_cflash = storage->get_data<event_opflash>(_opflash_producer);
     event_cflash->clear();
-    if(event_oph && event_opwf && event_oph->size()) {
+    if(event_oph && event_oph->size()) {
 
-      // Get beamwindow start t
-      double wf_start=0;
-      for(auto const& wf : *event_opwf) {
-	if(wf.size() < 1000) continue;
-	wf_start = wf.TimeStamp();
-	break;
-      }
       for(size_t mcf_idx=0; mcf_idx<flash_time_v.size(); ++mcf_idx){
 	auto const& mc_g4time = flash_time_v[mcf_idx];
 	double mc_electime = ts->G4ToElecTime(mc_g4time);
+	//std::cout<<"MC time: " << mc_electime << std::endl;
 	std::vector<double> pe_v(geo->NOpDets(),0);
 	for(auto const& oph : *event_oph) {
+	  if(oph.OpChannel() < _ignore_ch_below) continue;
+	  if(oph.OpChannel() > _ignore_ch_above) continue;
 	  const size_t opch = oph.OpChannel() % 100;
-	  if(opch > 31) continue;
+	  //if(oph.PE()>5) std::cout << oph.OpChannel() << " ... " << oph.PE() << " @ " << oph.PeakTime() << " or " << oph.PeakTimeAbs() << std::endl;
 	  if(oph.PeakTimeAbs() < mc_electime || oph.PeakTimeAbs() > (mc_electime + 8)) {
-	    //std::cout << "Ignoring pulse @ " << oph.PeakTimeAbs() << " trigger = " << trig_time << std::endl;
+	    /*
+	    std::cout << "Ignoring channel " << oph.OpChannel() 
+		      << " pulse @ " << oph.PeakTimeAbs() 
+		      << " trigger = " << trig_time << std::endl;
+	    */
 	    continue;
 	  }
 	  if(_emulate_fem && oph.PeakTimeAbs() > (mc_electime +0.625))

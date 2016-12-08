@@ -27,7 +27,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    CheatFlashFinder(){ _name="CheatFlashFinder"; _fout=0;}
+    CheatFlashFinder(){ _name="CheatFlashFinder"; _fout=0; _ignore_ch_below=0; _ignore_ch_above=31; _emulate_fem=false;}
 
     /// Default destructor
     virtual ~CheatFlashFinder(){}
@@ -52,10 +52,15 @@ namespace larlite {
 
     void EmulateFEM(bool doit) { _emulate_fem = doit; }
 
+    void IgnoreChannelBelow(int ch ) { _ignore_ch_below=ch; }
+    void IgnoreChannelAbove(int ch ) { _ignore_ch_above=ch; }
+
   protected:
     bool _emulate_fem;
     std::string _ophit_producer;
     std::string _opflash_producer;
+    int _ignore_ch_below;
+    int _ignore_ch_above;
   };
 }
 #endif

@@ -26,11 +26,11 @@ my_proc.set_ana_output_file("from_test_ana_you_can_remove_me.root");
 # Replace with your analysis unit if you wish.
 module1 = fmwk.FlashComp()
 module1.TreePrefix("beam")
-module1.SetProducers("cheatFlashBeam","opflashSatBeam","simpleFlashBeam")
+module1.SetProducers("cheatFlashBeam","","simpleFlashBeam")
 
 module2 = fmwk.FlashComp()
 module2.TreePrefix("cosmic")
-module2.SetProducers("cheatFlashCosmic","opflashSatCosmic","simpleFlashCosmic")
+module2.SetProducers("cheatFlashCosmic","","simpleFlashCosmic")
 
 my_proc.add_process(module1)
 #my_proc.add_process(module2)

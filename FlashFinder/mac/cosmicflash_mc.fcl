@@ -1,7 +1,8 @@
 FlashFinder:
 {
     FlashFinderAlgo : "SimpleFlashAlgo"
-    OpHitProducer   : "ophitSatCosmic"
+    #OpHitProducer   : "ophitSatCosmic"
+    OpHitProducer   : "OpHitFinder"
     OpFlashProducer : "simpleFlashCosmic"
     PECalib: "NoCalib"
     BeamFlash: false
